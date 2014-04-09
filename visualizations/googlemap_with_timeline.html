@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no"/>
+    <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=true"></script>
+    <script type="text/javascript"  src="http://d3js.org/d3.v3.min.js"></script>
+    <style type="text/css">
+
+html, body, #map {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.quakes, .quakes svg {
+  position: absolute;
+}
+
+.quakes svg {
+  width: 200px;
+  height: 200px;
+  padding:200px;
+  font: 10px sans-serif;
+}
+
+.quakes circle {
+  stroke: black;
+  stroke-width: 1px;
+}
+.graticule {
+  fill: none;
+  stroke: #fff;
+  stroke-width: .5px;
+}
+
+.land {
+  fill: #007421;
+}
+
+.dot {
+  fill: #c7141a;
+}
+
+.ring {
+  fill: none;
+  stroke: #c7141a;
+}
+
+.g-axis .tick-special.tick-earthquake {
+  fill: #B43030;
+}
+
+.g-axis .tick-special.tick-tsunami {
+  fill: #405695;
+}
+
+.g-axis {
+  font: 10px sans-serif;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+  fill: #777;
+}
+
+.g-axis .domain {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 8px;
+  stroke-linecap: round;
+}
+
+.g-axis .tick line {
+  stroke: #aaa;
+  shape-rendering: crispEdges;
+}
+
+.g-axis .tick-special {
+  font-weight: bold;
+  fill: black;
+}
+
+.g-axis .g-halo {
+  fill: none;
+  stroke: #ccc;
+  stroke-width: 10px;
+  stroke-linecap: round;
+}
+
+.g-slider .background {
+  cursor: ew-resize !important;
+}
+
+.g-slider .g-handle {
+  fill: #fff;
+  stroke: #000;
+  stroke-width: 1.0px;
+  pointer-events: none;
+}
+
+
+.g-axis .g-halo {
+  fill: none;
+  stroke: #ccc;
+  stroke-width: 10px;
+  stroke-linecap: round;
+}
+
+
+
+
+
+.g-graphic {
+  position: relative;
+  background-color: #C2E0FF;
+}
+#g-play-button {
+  position: absolute;
+  top: 15px;
+  left: 10px;
+  background: #004276;
+  padding-right: 26px;
+  border-radius: 2px;
+  border: none;
+  color: white;
+  margin: 0;
+  padding: 0 12px;
+  width: 68px;
+  cursor: pointer;
+  height: 30px;
+  font: 13px sans-serif;
+}
+
+#g-play-button:hover {
+  background-color: #064d84;
+}
+
+#g-play-button:active {
+  background-color: #002657;
+}
+.g-graphic svg {
+  border-top: solid 1px #ccc;
+  font-family: Arial;
+  z-index:1;
+}
+    </style>
+  </head>
+  <body>
+  <div class="g-graphic">
+	<button id="g-play-button">Pause</button>
+	</div>
+    <div id="map"></div>
+    <script type="text/javascript">
+
+// Create the Google Map…
+var map = new google.maps.Map(d3.select("#map").node(), {
+  zoom: 5,
+  center: new google.maps.LatLng(36.605814, 141.729368),
+  mapTypeId: google.maps.MapTypeId.ROADMAP
+});
+
+var width = 960,
+	height = 500;
+	
+
+
+
+// Load the quakes data. When the data comes back, create an overlay.
+d3.json("earthquakes_short.json", function(data) {
+  var overlay = new google.maps.OverlayView();
+
+  // Add the container when the overlay is added to the map.
+  overlay.onAdd = function() {
+    var layer = d3.select(this.getPanes().overlayLayer).append("div")
+        .attr("class", "quakes");
+
+    // Draw each marker as a separate SVG element.
+    // We could use a single SVG, but what size would it have?
+    overlay.draw = function() {
+      var googleProjection = this.getProjection(),
+          padding = 200;
+	  
+		var projection = d3.geo.mercator()
+			.center([113, -3])
+			.scale(1275)
+			.translate([width / 2, height / 2])
+			.clipExtent([[0, 0], [width, height]])
+			.precision(.1);
+
+      var marker = layer.selectAll("svg")
+          .data(d3.entries(data.features))
+          .each(transform) // update existing markers
+          .enter().append("svg:svg")
+          .each(transform)
+          .attr("class", "marker");
+
+
+      // Add a label.
+      marker.append("svg:text")
+          .attr("x", 17)
+          .attr("y", 10)
+          .attr("dy", ".2em")
+          .text(function(d) { return d.value.properties.mag; });
+
+	//add rings
+
+
+						
+					
+					var path = d3.geo.path()
+						.projection(projection);
+
+					var graticule = d3.geo.graticule()
+						.step([5, 5]);
+
+
+					marker.append("circle")
+						.attr("class", "dot")
+						.attr("r", 2);
+
+					setInterval(function() {
+					  marker.append("circle")
+						  .attr("class", "ring")
+						  .attr("r", 3)
+						  .style("stroke-width", 3)
+						  .style("stroke", "red")
+						  .transition()
+						  .ease("linear")
+						  .duration(6000)
+						  .style("stroke-opacity", 1e-6)
+						  .style("stroke-width", 1)
+						  .style("stroke", "brown")
+						  .attr("r", map.getZoom() *5)
+						  .remove();
+					}, 750);
+
+      function transform(d) {
+        d = new google.maps.LatLng(d.value.geometry.coordinates[1], d.value.geometry.coordinates[0]);
+        d = googleProjection.fromLatLngToDivPixel(d);
+        return d3.select(this)
+            .style("left", (d.x - padding) + "px")
+            .style("top", (d.y - padding) + "px");
+      }
+    };
+  };
+//end add rings					
+//Add slider
+
+var slider,
+    handle,
+    track,
+    trail,
+    boat,
+    wind,
+    gate,
+    compass;
+	
+var x = d3.scale.linear()
+    .range([110, width - 40])
+    .clamp(true);	
+	
+var brush = d3.svg.brush()
+    .x(x)
+    .extent([0, 0])
+    .on("brush", brushed);
+	
+var playButton = d3.select("#g-play-button");
+
+var moving,
+    minValue,
+    maxValue,
+    currentValue,
+    targetValue,
+    trailLength = 30,
+    alpha = .25;
+
+var formatMinute = d3.format("+.0f");
+
+
+
+var xTicks = {
+  "0": "2011",
+  "1404": "Earthquake",
+  "1448": "Tsunami"
+};
+
+var	brushHeight = 60;	
+
+
+  var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient("bottom")
+    .tickFormat(function(t) { return xTicks[t] || formatMinute(t / 60) + " min."; })
+    .tickSize(12, 0)
+    .tickPadding(0);	
+	
+var svg = d3.select(".g-graphic").append("svg")
+    .attr("width", width)
+    .attr("height", 50);
+	
+  var gX = svg.append("g")
+      .attr("class", "g-x g-axis")
+      .attr("transform", "translate(0," + brushHeight / 2 + ")")
+      .call(xAxis);
+
+  gX.select(".domain")
+    .select(function() { return this.parentNode.insertBefore(this.cloneNode(true), this); })
+      .attr("class", "g-halo");
+
+  
+
+	  
+  var tick = gX.selectAll(".tick")
+      .each(function() { this.parentNode.appendChild(this); });
+
+  tick.select("line")
+      .attr("y1", -8)
+      .attr("y2", 8);
+
+  tick.filter(function(d) { return d in xTicks; })
+      .attr("class", function(d) { return "tick tick-special tick-" + xTicks[d].toLowerCase(); });
+
+	  
+  slider = svg.append("g")
+      .attr("class", "g-slider")
+      .call(brush);
+
+  slider.selectAll(".extent,.resize")
+      .remove();
+
+  slider.select(".background")
+      .attr("height", brushHeight);
+
+  handle = slider.append("circle")
+      .attr("class", "g-handle")
+      .attr("transform", "translate(0," + brushHeight / 2 + ")")
+      .attr("r", 8);
+//end add slider
+//pause function for slider
+
+
+playButton
+      .on("click", paused)
+      .each(paused);
+
+
+function paused() {
+console.log("paused");
+  if (slider.node().__transition__) {
+    slider.interrupt();
+    this.textContent = "Play";
+  } else {
+    if (currentValue === maxValue) slider
+        .call(brush.extent([currentValue = minValue, currentValue]))
+        .call(brush.event)
+        .call(brushBackground);
+
+    targetValue = maxValue;
+
+    slider.transition()
+        .duration((targetValue - currentValue) / (targetValue - minValue) * 20000)
+        .ease("linear")
+        .call(brush.extent([targetValue, targetValue]))
+        .call(brush.event)
+        .call(brushBackground);
+
+    this.textContent = "Pause";
+  }
+}
+//end pause function for slider
+//brush slider function
+function brushBackground() {
+  slider.select(".background")
+      .attr("x", -40)
+      .attr("width", width + 40);
+}
+
+function move() {
+  var copyValue = currentValue; // detect interrupt
+  if (moving) return false;
+  moving = true;
+
+  d3.timer(function() {
+    if (copyValue !== currentValue) return !(moving = false);
+
+    copyValue = currentValue = Math.abs(currentValue - targetValue) < 1e-3
+        ? targetValue
+        : targetValue * alpha + currentValue * (1 - alpha);
+
+    slider
+        .call(brush.extent([currentValue, currentValue]))
+        .call(brush.event)
+        .call(brushBackground);
+
+    return !(moving = currentValue !== targetValue);
+  });
+}
+
+
+function brushed() {
+  if (d3.event.sourceEvent) { // not a programmatic event
+    if (d3.event.sourceEvent.target.parentNode === this) { // clicked on the brush
+      playButton.text("Play");
+      targetValue = x.invert(d3.mouse(this)[0]);
+      move();
+    }
+  } else {
+    //currentValue = brush.extent()[0];
+    //handle.attr("cx", x(currentValue));
+    //var i = Math.round(currentValue) + indexOffset;
+    //gate.classed("g-course-crossed", function(d) { return currentValue >= d.properties.time; });
+    //boat.attr("transform", function(d) { return "translate(" + projection(d.coordinates[i]) + ")"; });
+    //track.attr("d", function(d) { return path({type: "LineString", coordinates: d.coordinates.slice(0, i + 1)}); });
+    //trail.attr("d", function(d) { return path({type: "LineString", coordinates: d.coordinates.slice(Math.max(0, i - trailLength), i + 1)}); });
+    //wind.select(".g-speed").text(function(d) { return windFormat(d[i][3]) + " knots"; });
+    //compass.attr("transform", function(d) { return "rotate(" + (180 + d[i][4]) + ")"; });
+  }
+}
+//end brush slider function
+
+
+
+	  
+
+
+  // Bind our overlay to the map…
+  overlay.setMap(map);
+});
+
+    </script>
+  </body>
+</html>
