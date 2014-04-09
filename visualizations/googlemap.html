@@ -46,9 +46,38 @@ html, body, #map {
   fill: none;
   stroke: #c7141a;
 }
+
+
+#g-play-button {
+  position: absolute;
+  top: 15px;
+  left: 10px;
+  background: #004276;
+  padding-right: 26px;
+  border-radius: 2px;
+  border: none;
+  color: white;
+  margin: 0;
+  padding: 0 12px;
+  width: 68px;
+  cursor: pointer;
+  height: 30px;
+  font: 13px sans-serif;
+}
+
+#g-play-button:hover {
+  background-color: #064d84;
+}
+
+#g-play-button:active {
+  background-color: #002657;
+}
     </style>
   </head>
   <body>
+  <div class="g-graphic">
+	<button id="g-play-button">Pause</button>
+	</div>
     <div id="map"></div>
     <script type="text/javascript">
 
@@ -136,9 +165,121 @@ d3.json("earthquakes_short.json", function(data) {
 
 
 //end add rings					
-		  
+//Add slider
 
-		  
+var slider,
+    handle,
+    track,
+    trail,
+    boat,
+    wind,
+    gate,
+    compass;		  
+	
+var brush = d3.svg.brush()
+    .x(x)
+    .extent([0, 0])
+    .on("brush", brushed);
+	
+	
+var	brushHeight = 60;	
+
+var x = d3.scale.linear()
+    .range([110, width - 40])
+    .clamp(true);
+	
+  slider = layer.append("g")
+      .attr("class", "g-slider")
+      .call(brush);
+
+  slider.selectAll(".extent,.resize")
+      .remove();
+
+  slider.select(".background")
+      .attr("height", brushHeight);
+
+  handle = slider.append("circle")
+      .attr("class", "g-handle")
+      .attr("transform", "translate(0," + brushHeight / 2 + ")")
+      .attr("r", 8);
+//end add slider
+//pause function for slider
+function paused() {
+  if (slider.node().__transition__) {
+    slider.interrupt();
+    this.textContent = "Play";
+  } else {
+    if (currentValue === maxValue) slider
+        .call(brush.extent([currentValue = minValue, currentValue]))
+        .call(brush.event)
+        .call(brushBackground);
+
+    targetValue = maxValue;
+
+    slider.transition()
+        .duration((targetValue - currentValue) / (targetValue - minValue) * 20000)
+        .ease("linear")
+        .call(brush.extent([targetValue, targetValue]))
+        .call(brush.event)
+        .call(brushBackground);
+
+    this.textContent = "Pause";
+  }
+}
+//end pause function for slider
+//brush slider function
+function brushBackground() {
+  slider.select(".background")
+      .attr("x", -40)
+      .attr("width", width + 40);
+}
+
+function move() {
+  var copyValue = currentValue; // detect interrupt
+  if (moving) return false;
+  moving = true;
+
+  d3.timer(function() {
+    if (copyValue !== currentValue) return !(moving = false);
+
+    copyValue = currentValue = Math.abs(currentValue - targetValue) < 1e-3
+        ? targetValue
+        : targetValue * alpha + currentValue * (1 - alpha);
+
+    slider
+        .call(brush.extent([currentValue, currentValue]))
+        .call(brush.event)
+        .call(brushBackground);
+
+    return !(moving = currentValue !== targetValue);
+  });
+}
+
+
+function brushed() {
+  if (d3.event.sourceEvent) { // not a programmatic event
+    if (d3.event.sourceEvent.target.parentNode === this) { // clicked on the brush
+      playButton.text("Play");
+      targetValue = x.invert(d3.mouse(this)[0]);
+      move();
+    }
+  } else {
+    currentValue = brush.extent()[0];
+    handle.attr("cx", x(currentValue));
+    var i = Math.round(currentValue) + indexOffset;
+    gate.classed("g-course-crossed", function(d) { return currentValue >= d.properties.time; });
+    boat.attr("transform", function(d) { return "translate(" + projection(d.coordinates[i]) + ")"; });
+    track.attr("d", function(d) { return path({type: "LineString", coordinates: d.coordinates.slice(0, i + 1)}); });
+    trail.attr("d", function(d) { return path({type: "LineString", coordinates: d.coordinates.slice(Math.max(0, i - trailLength), i + 1)}); });
+    wind.select(".g-speed").text(function(d) { return windFormat(d[i][3]) + " knots"; });
+    compass.attr("transform", function(d) { return "rotate(" + (180 + d[i][4]) + ")"; });
+  }
+}
+//end brush slider function
+
+
+
+	  
       function transform(d) {
         d = new google.maps.LatLng(d.value.geometry.coordinates[1], d.value.geometry.coordinates[0]);
         d = googleProjection.fromLatLngToDivPixel(d);
@@ -152,6 +293,7 @@ d3.json("earthquakes_short.json", function(data) {
   // Bind our overlay to the map…
   overlay.setMap(map);
 });
+
 
     </script>
   </body>
