@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        body {
+            background-color:#eaf0ff;
+        }
+    </style>
+</head>
+<body>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script src="http://d3js.org/d3.v2.min.js?2.10.0"></script>
+<script>
+
+    var width = 960,
+        height = 700,
+        centered;
+
+    var svg = d3.select("body").append("svg")
+        .attr("width", width)
+        .attr("height", height);
+
+    var xym = d3.geo.albers();
+    var path = d3.geo.path().projection(xym);
+
+    xym.origin([134, 25])
+    xym.translate([350, 745])
+    xym.parallels([24.6, 43.6])
+    xym.scale(1980)
+
+    var g = svg.append("g");
+
+    function processData(allText) {
+        var allTextLines = allText.split(/\r\n|\n/);
+        var headers = allTextLines[0].split(',');
+        radiation = [];
+
+        for (var i=1; i<allTextLines.length; i++) {
+            var data = allTextLines[i].split(',');
+            if (data.length == headers.length) {
+
+                var tarr = [];
+                for (var j=0; j<headers.length; j++) {
+                    tarr.push(data[j]);
+                }
+                radiation.push(tarr);
+            }
+        }
+    }
+
+    function clicked(d) {
+        var x, y, k;
+
+        if (d && centered !== d) {
+            var centroid = path.centroid(d);
+            x = centroid[0];
+            y = centroid[1];
+            k = 15;
+            centered = d;
+        } else {
+            x = width / 2;
+            y = height / 2;
+            k = 1;
+            centered = null;
+        }
+
+        g.selectAll("path")
+            .classed("active", centered && function(d) { return d === centered; });
+
+        g.transition()
+            .duration(1500)
+            .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")scale(" + k + ")translate(" + -x + "," + -y + ")")
+            .style("stroke-width", 1.5 / k + "px");
+    }
+
+    function dataSource1() {
+        return $.ajax({
+            type: "GET",
+            url: "radiation1012.csv",
+            dataType: "text",
+            success: function (data) {
+                processData(data);
+            }
+        });
+    }
+
+    d3.json("japan.json", function(data) {
+        g.append("g")
+            .selectAll("path")
+            .data(data.features)
+            .enter()
+            .append("path")
+            .attr("d", path)
+            .style("fill", function() { return "#5e8b16" })
+            .on("mouseover", function(e){d3.select(this).style("fill", "#b30000")})
+            .on("mouseout", function(e){d3.select(this).style("fill", "#5e8b16")})
+            .on("click", clicked);
+
+        dataSource1();
+    });
+
+    $.when(dataSource1()).done(function () {
+        console.log(radiation);
+            g.append("g")
+                .selectAll("circle")
+                .data(radiation)
+                .enter()
+                .append("circle")
+                .attr("cx", function(d) {
+                    console.log(xym([d[1], d[0]]));
+                    return xym([d[1], d[0]])[0];
+                })
+                .attr("cy", function(d) {
+                    console.log(xym([d[1], d[0]])[1]);
+                    return xym([d[1], d[0]])[1];
+                })
+                .attr("r", ".5")
+                .style("fill", "red")
+                .style("opacity", 0.75);
+    });
+
+
+</script>
