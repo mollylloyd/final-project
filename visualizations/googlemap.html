@@ -92,7 +92,7 @@ d3.json("earthquakes_short.json", function(data) {
 		}, 750);
 
       function transform(d) {
-	  console.log(d);
+	  console.log(d.value.geometry.coordinates[1]);
         d = new google.maps.LatLng(d.value.geometry.coordinates[1], d.value.geometry.coordinates[0]);
         d = googleProjection.fromLatLngToDivPixel(d);
         return d3.select(this)

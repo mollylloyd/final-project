@@ -5,7 +5,7 @@
     <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=true"></script>
     <script type="text/javascript"  src="http://d3js.org/d3.v3.min.js"></script>
     <script src="../libs/jquery-1.11.0.min.js"></script>
-    <script src="http://d3js.org/d3.geom.contour.v0.min.js"></script>
+  
     <style type="text/css">
 
 html, body, #map {
@@ -15,10 +15,7 @@ html, body, #map {
   padding: 0;
 }
 
-.isoline {
-  fill: none;
-  stroke: #fff;
-}
+
 .quakes, .quakes svg {
   position: absolute;
 }
@@ -170,7 +167,7 @@ var width = 960,
 var jsonRows ={};
 
 // Load the quakes data. When the data comes back, create an overlay.
-d3.csv("../data/waveHeight.csv", function(data) {
+d3.csv("../data/waveHeightShort.csv", function(data) {
   data.forEach(function(d,i){
     jsonRows[i] = {"country":d.Country,"state":d.State,"name":d.Name,"distance":+d.DistanceFromSource,"lat":+d.Latitude, "lon":+d.Longitude,
           "waveHeight":+d.MaxWaveHeight, "waveHeight":+d.MaxWaveHeight,"arrivalDate":  new Date(2011,03,+d.ArrivalDay,+d.ArrivalHour, +d.ArrivalMin),
@@ -247,14 +244,14 @@ map.setOptions({styles: styles});
           padding = 200;
 	  
 var projection = d3.geo.mercator()
-			.center([36.5, 135.5])
+			.center([113, -3])
 			.scale(1275)
 			.translate([width / 2, height / 2])
 			.clipExtent([[0, 0], [width, height]])
 			.precision(.1);
 
 var color = d3.scale.linear()
-    .domain([0, 30])
+    .domain([2, 10])
     .range(["white", "orangered"])
     .interpolate(d3.interpolateLab);
 
@@ -274,15 +271,21 @@ console.log(data[0].Latitude);
    var marker = layerWaves.selectAll("svg")
           .data(d3.entries(jsonRows))
           .each(transform) // update existing markers
-          .enter().append("svg:circle")
+          .enter().append("svg:svg")
           .each(transform)
-          .attr("class", "marker");
+          .attr("class","marker");
+          
 
-    
+    marker.append("circle")
+            .attr("class", "circle")
+            .attr("r", 10)
+            .style("fill", function(d){
+              return color(d.value.waveHeight);
+            });
 
     function transform(d) {
-        console.log(d);
-        d = new google.maps.LatLng(d.value.lat, d.value.lon);
+        
+        d = new google.maps.LatLng(d.value.lat,d.value.lon);
         d = googleProjection.fromLatLngToDivPixel(d);
         return d3.select(this)
             .style("left", (d.x - padding) + "px")
