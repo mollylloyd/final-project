@@ -14,6 +14,7 @@
   </div>
     <div id="map"></div>
     <script type="text/javascript">
+      
 
 // Create the Google Map
 var map = new google.maps.Map(d3.select("#map").node(), {
@@ -33,8 +34,8 @@ var googleProjection,
 var styles = [
   {
     stylers: [
-      { hue: "B2FFF0" },
-      { saturation: -75 }
+      { hue: "#00B26B" },
+      { saturation: -50}
     ]
   },{
     featureType: "road",
@@ -51,11 +52,12 @@ var styles = [
     ]
   },
   {
-    featureType: "landscape.natural",
+    featureType: "landscape",
     elementType: "all",
     stylers: [ 
-      {visibility: "simplified"},
-  		{hue:"#ffb300"}
+      {visibility: "on"},
+  	{color:"#858585"},
+	{saturation:-50}
       ]
   },
   {
@@ -87,7 +89,7 @@ map.setOptions({styles: styles});
 function loadData() {
 	queue()
 		.defer(d3.json, 'earthquakes_short.json') // Get the Earthquake Data
-		.defer(d3.csv, '../data/waveHeightShort.csv') // Get the Tsunami Data
+		.defer(d3.csv, 'waveHeightShort.csv') // Get the Tsunami Data
 		.defer(d3.json, 'earthquakes_short.json') // Get the Radiation Data
 		.await(createVis); // function to create
 }
@@ -180,6 +182,10 @@ function addEarthquakes(data){
 		}, 750);
 }
 
+var color = d3.scale.linear()
+    .domain([0,20])
+    .range(["white","orangered"])
+    .interpolate(d3.interpolateLab);
 
 function addTsunami(data){
 		var waves = tsunamiLayer.selectAll("svg")
@@ -191,7 +197,9 @@ function addTsunami(data){
 			
 		waves.append("circle")
 			.attr("class", "wave-circle")
-			.attr("r", 1);
+			.attr("r", 3)
+                        .style("fill", function(d) {
+	                    return color(d.value.MaxWaveHeight)});
 }
 
 function addRadiation(data){
@@ -200,6 +208,7 @@ console.log(data);
 }
 
 loadData();
+
     </script>
   </body>
 </html>
