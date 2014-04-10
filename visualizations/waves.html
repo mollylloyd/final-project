@@ -251,8 +251,8 @@ var projection = d3.geo.mercator()
 			.precision(.1);
 
 var color = d3.scale.linear()
-    .domain([2, 10])
-    .range(["white", "orangered"])
+    .domain([2,7])
+    .range(["orangered","white"])
     .interpolate(d3.interpolateLab);
 
 console.log(data[0].Latitude);
@@ -282,6 +282,8 @@ console.log(data[0].Latitude);
             .style("fill", function(d){
               return color(d.value.waveHeight);
             });
+
+console.log(googleProjection);
 
     function transform(d) {
         
@@ -456,6 +458,7 @@ function brushed() {
       move();
     }
   } else {
+    
     //currentValue = brush.extent()[0];
     //handle.attr("cx", x(currentValue));
     //var i = Math.round(currentValue) + indexOffset;
