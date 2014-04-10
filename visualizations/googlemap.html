@@ -29,11 +29,65 @@ var googleProjection,
 	earthquakesLayer,
 	tsunamiLayer;
 
+//begin basemap styles
+var styles = [
+  {
+    stylers: [
+      { hue: "B2FFF0" },
+      { saturation: -75 }
+    ]
+  },{
+    featureType: "road",
+    elementType: "geometry",
+    stylers: [
+      { lightness: 100 },
+      { visibility: "off" }
+    ]
+  },{
+    featureType: "road",
+    elementType: "labels",
+    stylers: [
+      { visibility: "off" }
+    ]
+  },
+  {
+    featureType: "landscape.natural",
+    elementType: "all",
+    stylers: [ 
+      {visibility: "simplified"},
+  		{hue:"#ffb300"}
+      ]
+  },
+  {
+    featureType: "administrative.locality",
+    elementType:"labels",
+    stylers: [
+      {visibility:"off"},
+    ]
+  },
+  {
+    featureType:"administrative.province",
+    elementType:"geometry.stroke",
+    stylers: [{visibility:"off"}]
+  },
+  {
+  	featureType:"administrative.province",
+  	elementType:"geometry",
+  	stylers:[
+  		{hue:"#0D0D0D"},
+  		{saturation:100}
+  			]
+  }
+];
+//end map styles
+
+//apply map styles to the map
+map.setOptions({styles: styles});
 //Use queue() to load data and avoid asynchronous problems
 function loadData() {
 	queue()
 		.defer(d3.json, 'earthquakes_short.json') // Get the Earthquake Data
-		.defer(d3.csv, 'waveHeightShort.csv') // Get the Tsunami Data
+		.defer(d3.csv, '../data/waveHeightShort.csv') // Get the Tsunami Data
 		.defer(d3.json, 'earthquakes_short.json') // Get the Radiation Data
 		.await(createVis); // function to create
 }
