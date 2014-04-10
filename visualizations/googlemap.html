@@ -33,8 +33,10 @@ var map = new google.maps.Map(d3.select("#map").node(), {
 var googleProjection,
     quakePadding = 200,
 	wavePadding = 20,
+    radiationPadding = 20,
 	earthquakesLayer,
-	tsunamiLayer;
+	tsunamiLayer,
+    nuclearLayer;
 
 //begin basemap styles
 var styles = [
@@ -96,11 +98,9 @@ function loadData() {
 	queue()
 		.defer(d3.json, 'earthquakes_short.json') // Get the Earthquake Data
 		.defer(d3.csv, 'waveHeightShort.csv') // Get the Tsunami Data
-		.defer(d3.json, 'earthquakes_short.json') // Get the Radiation Data
+		.defer(d3.csv, 'radiation1012.csv') // Get the Radiation Data
 		.await(createVis); // function to create
 }
-
-
 
 // Load the quakes data. When the data comes back, create an overlay.
 function createVis(error,earthquake_data,tsunami_data,radiation_data){
@@ -113,6 +113,9 @@ function createVis(error,earthquake_data,tsunami_data,radiation_data){
 		
 	tsunamiLayer = d3.select(this.getPanes().overlayLayer).append("div")
         .attr("class", "waves");
+
+    nuclearLayer = d3.select(this.getPanes().overlayLayer).append("div")
+        .attr("class", "radiation");
 
     overlay.draw = function() {
 	    googleProjection = this.getProjection();
@@ -130,8 +133,6 @@ function createVis(error,earthquake_data,tsunami_data,radiation_data){
 }
 
 
-
-
 function transformQuake(d) {
 	d = new google.maps.LatLng(d.value.geometry.coordinates[1], d.value.geometry.coordinates[0]);
 	d = googleProjection.fromLatLngToDivPixel(d);
@@ -147,6 +148,15 @@ function transformWave(d) {
 	return d3.select(this)
 		.style("left", (d.x - wavePadding) + "px")
 		.style("top", (d.y - wavePadding) + "px");
+}
+
+function transformRadiation(d) {
+//console.log(d);
+    d = new google.maps.LatLng(d.value.Latitude, d.value.Longitude);
+    d = googleProjection.fromLatLngToDivPixel(d);
+    return d3.select(this)
+        .style("left", (d.x - radiationPadding) + "px")
+        .style("top", (d.y - radiationPadding) + "px");
 }
 
 //Add Earthquakes 
@@ -204,13 +214,21 @@ function addTsunami(data){
 		waves.append("circle")
 			.attr("class", "wave-circle")
 			.attr("r", 3)
-                        .style("fill", function(d) {
-	                    return color(d.value.MaxWaveHeight)});
+            .style("fill", function(d) {
+	            return color(d.value.MaxWaveHeight)});
 }
 
 function addRadiation(data){
-console.log(data);
-//TODO add vis
+//console.log(data);
+    var radiation = nuclearLayer.selectAll("svg")
+        .data(d3.entries(data))
+        .each(transformRadiation) // update existing markers
+        .enter().append("svg:svg")
+        .each(transformRadiation);
+
+    radiation.append("circle")
+        .attr("r", 2)
+        .style("fill", "red");
 }
 
 loadData();

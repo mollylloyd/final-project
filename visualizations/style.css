@@ -38,6 +38,22 @@ html, body, #map {
   stroke-width: 1px;
 }
 
+.radiation, .radiation svg {
+    position: absolute;
+}
+
+.radiation svg {
+    width: 20px;
+    height: 20px;
+    padding:20px;
+    font: 10px sans-serif;
+}
+
+.radiation wave-circle {
+    stroke: black;
+    stroke-width: 1px;
+}
+
 .land {
   fill: #007421;
 }
