@@ -16,21 +16,37 @@ html, body, #map {
   font: 10px sans-serif;
 }
 
-.quakes circle {
+.quakes quake-circle {
   stroke: black;
   stroke-width: 1px;
 }
-.graticule {
-  fill: none;
-  stroke: #fff;
-  stroke-width: .5px;
+
+
+.waves, .waves svg {
+  position: absolute;
+}
+
+.waves svg {
+  width: 20px;
+  height: 20px;
+  padding:20px;
+  font: 10px sans-serif;
+}
+
+.waves wave-circle {
+  stroke: black;
+  stroke-width: 1px;
 }
 
 .land {
   fill: #007421;
 }
 
-.dot {
+.wave-circle {
+  fill: #0000FF;
+}
+
+.quake-circle {
   fill: #c7141a;
 }
 
