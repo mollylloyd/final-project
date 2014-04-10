@@ -76,8 +76,8 @@ html, body, #map {
   </head>
   <body>
   <div class="g-graphic">
-	<button id="g-play-button">Pause</button>
-	</div>
+  <button id="g-play-button">Pause</button>
+  </div>
     <div id="map"></div>
     <script type="text/javascript">
 
@@ -102,13 +102,13 @@ d3.json("earthquakes_short.json", function(data) {
     overlay.draw = function() {
       var googleProjection = this.getProjection(),
           padding = 200;
-	  
-		var projection = d3.geo.mercator()
-			.center([113, -3])
-			.scale(1275)
-			.translate([width / 2, height / 2])
-			.clipExtent([[0, 0], [width, height]])
-			.precision(.1);
+
+    var projection = d3.geo.mercator()
+      .center([113, -3])
+      .scale(1275)
+      .translate([width / 2, height / 2])
+      .clipExtent([[0, 0], [width, height]])
+      .precision(.1);
 
       var marker = layer.selectAll("svg")
           .data(d3.entries(data.features))
@@ -125,46 +125,46 @@ d3.json("earthquakes_short.json", function(data) {
           .attr("dy", ".2em")
           .text(function(d) { return d.value.properties.title; });
 
-	//add rings
+  //add rings
 
-					var width = 960,
-						height = 500;
-						
-					
-					var path = d3.geo.path()
-						.projection(projection);
-
-					var graticule = d3.geo.graticule()
-						.step([5, 5]);
-						
-					
-					marker.append("path")
-						.datum(graticule)
-						.attr("class", "graticule")
-						.attr("d", path);
-
-					marker.append("circle")
-						.attr("class", "dot")
-						.attr("r", 2);
-
-					setInterval(function() {
-					  marker.append("circle")
-						  .attr("class", "ring")
-						  .attr("r", 3)
-						  .style("stroke-width", 3)
-						  .style("stroke", "red")
-						  .transition()
-						  .ease("linear")
-						  .duration(6000)
-						  .style("stroke-opacity", 1e-6)
-						  .style("stroke-width", 1)
-						  .style("stroke", "brown")
-						  .attr("r", map.getZoom() *5)
-						  .remove();
-					}, 750);
+          var width = 960,
+            height = 500;
 
 
-//end add rings					
+          var path = d3.geo.path()
+            .projection(projection);
+
+          var graticule = d3.geo.graticule()
+            .step([5, 5]);
+
+
+          marker.append("path")
+            .datum(graticule)
+            .attr("class", "graticule")
+            .attr("d", path);
+
+          marker.append("circle")
+            .attr("class", "dot")
+            .attr("r", 2);
+
+          setInterval(function() {
+            marker.append("circle")
+              .attr("class", "ring")
+              .attr("r", 3)
+              .style("stroke-width", 3)
+              .style("stroke", "red")
+              .transition()
+              .ease("linear")
+              .duration(6000)
+              .style("stroke-opacity", 1e-6)
+              .style("stroke-width", 1)
+              .style("stroke", "brown")
+              .attr("r", map.getZoom() *5)
+              .remove();
+          }, 750);
+
+
+//end add rings         
 //Add slider
 
 var slider,
@@ -174,20 +174,20 @@ var slider,
     boat,
     wind,
     gate,
-    compass;		  
-	
+    compass;      
+
 var brush = d3.svg.brush()
     .x(x)
     .extent([0, 0])
     .on("brush", brushed);
-	
-	
-var	brushHeight = 60;	
+
+
+var brushHeight = 60; 
 
 var x = d3.scale.linear()
     .range([110, width - 40])
     .clamp(true);
-	
+
   slider = layer.append("g")
       .attr("class", "g-slider")
       .call(brush);
@@ -279,7 +279,7 @@ function brushed() {
 
 
 
-	  
+
       function transform(d) {
         d = new google.maps.LatLng(d.value.geometry.coordinates[1], d.value.geometry.coordinates[0]);
         d = googleProjection.fromLatLngToDivPixel(d);
