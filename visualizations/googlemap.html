@@ -18,10 +18,16 @@
 
 // Create the Google Map
 var map = new google.maps.Map(d3.select("#map").node(), {
-  zoom: 5,
-  //Center on Earthquake Epicenter
-  center: new google.maps.LatLng(36.605814, 141.729368),
-  mapTypeId: google.maps.MapTypeId.ROADMAP
+    zoom: 6,
+    //Center on Earthquake Epicenter
+    center: new google.maps.LatLng(39, 142.5),
+    mapTypeControl: false,
+    zoomControl: false,
+    draggable: false,
+    scrollwheel: false,
+    disableDoubleClickZoom: true,
+    mapTypeId     : google.maps.MapTypeId.ROADMAP,
+    disableDefaultUI: true
 });
 
 var googleProjection,
