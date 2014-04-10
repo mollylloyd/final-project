@@ -4,6 +4,8 @@
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no"/>
     <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=true"></script>
     <script type="text/javascript"  src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="../libs/jquery-1.11.0.min.js"></script>
+  
     <style type="text/css">
 
 html, body, #map {
@@ -12,6 +14,7 @@ html, body, #map {
   margin: 0;
   padding: 0;
 }
+
 
 .quakes, .quakes svg {
   position: absolute;
@@ -107,9 +110,6 @@ html, body, #map {
 }
 
 
-
-
-
 .g-graphic {
   position: relative;
   background-color: #C2E0FF;
@@ -143,16 +143,17 @@ html, body, #map {
   font-family: Arial;
   z-index:1;
 }
-    </style>
-  </head>
-  <body>
-  <div class="g-graphic">
-	<button id="g-play-button">Pause</button>
-	</div>
-    <div id="map"></div>
-    <script type="text/javascript">
+</style>
 
-// Create the Google Map…
+</head>
+  <body>
+    <div class="g-graphic">
+	     <button id="g-play-button">Pause</button>
+	 </div>
+  <div id="map"></div>
+<script type="text/javascript">
+
+// Create the Google Mapâ€¦
 var map = new google.maps.Map(d3.select("#map").node(), {
   zoom: 5,
   center: new google.maps.LatLng(36.605814, 141.729368),
@@ -163,16 +164,78 @@ var width = 960,
 	height = 500;
 	
 
-
+var jsonRows ={};
 
 // Load the quakes data. When the data comes back, create an overlay.
-d3.json("earthquakes_short.json", function(data) {
+d3.csv("../data/waveHeightShort.csv", function(data) {
+  data.forEach(function(d,i){
+    jsonRows[i] = {"country":d.Country,"state":d.State,"name":d.Name,"distance":+d.DistanceFromSource,"lat":+d.Latitude, "lon":+d.Longitude,
+          "waveHeight":+d.MaxWaveHeight, "waveHeight":+d.MaxWaveHeight,"arrivalDate":  new Date(2011,03,+d.ArrivalDay,+d.ArrivalHour, +d.ArrivalMin),
+          "maxWaveDate":new Date(2011,03,+d.MaxWaveDay,+d.MaxWaveHour,+d.MaxWaveMin)};  
+    });
+waveArray = [];
+
+
+
+ $.each(jsonRows, function(index, value){          
+          waveArray.push({"lat":value.lat,"lon": value.lon, "code": index, "waveHeight":value.waveHeight,"arrivalDate":value.arrivalDate});
+      });
+
+
+//begin map styles 
+
+var styles = [
+  {
+    stylers: [
+      { hue: "#F0F8FF" },
+      { saturation: -75 }
+    ]
+  },{
+    featureType: "road",
+    elementType: "geometry",
+    stylers: [
+      { lightness: 100 },
+      { visibility: "off" }
+    ]
+  },{
+    featureType: "road",
+    elementType: "labels",
+    stylers: [
+      { visibility: "off" }
+    ]
+  },
+  {
+    featureType: "landscape.natural",
+    elementType: "all",
+    stylers: [ 
+      {visibility: "off"}
+      ]
+  },
+  {
+    featureType: "administrative.locality",
+    elementType:"labels",
+    stylers: [
+      {visibility:"off"},
+    ]
+  },
+  {
+    featureType:"administrative.province",
+    elementType:"geometry.stroke",
+    stylers: [{visibility:"off"}]
+  }
+];
+//end map styles
+
+//apply map styles to the map
+map.setOptions({styles: styles});
+
+
   var overlay = new google.maps.OverlayView();
 
   // Add the container when the overlay is added to the map.
   overlay.onAdd = function() {
-    var layer = d3.select(this.getPanes().overlayLayer).append("div")
-        .attr("class", "quakes");
+    var layerWaves = d3.select(this.getPanes().overlayLayer).append("div")
+        .attr("class", "waves");
 
     // Draw each marker as a separate SVG element.
     // We could use a single SVG, but what size would it have?
@@ -180,67 +243,55 @@ d3.json("earthquakes_short.json", function(data) {
       var googleProjection = this.getProjection(),
           padding = 200;
 	  
-		var projection = d3.geo.mercator()
+var projection = d3.geo.mercator()
 			.center([113, -3])
 			.scale(1275)
 			.translate([width / 2, height / 2])
 			.clipExtent([[0, 0], [width, height]])
 			.precision(.1);
 
-      var marker = layer.selectAll("svg")
-          .data(d3.entries(data.features))
+var color = d3.scale.linear()
+    .domain([2, 10])
+    .range(["white", "orangered"])
+    .interpolate(d3.interpolateLab);
+
+console.log(data[0].Latitude);
+
+// waves = layerWaves.selectAll("svg")
+//     .data(d3.entries(jsonRows))
+//     .each(transform)
+//     .enter()
+//     .append("svg:circle")
+//     .attr("r",10)
+//     //.style("fill", function(d){
+//     //      if (d.waveHeight > 1) {return color(d.waveHeight)}
+//    // })
+//     .attr("class","waveMag");
+
+   var marker = layerWaves.selectAll("svg")
+          .data(d3.entries(jsonRows))
           .each(transform) // update existing markers
           .enter().append("svg:svg")
           .each(transform)
-          .attr("class", "marker");
+          .attr("class","marker");
+          
 
+    marker.append("circle")
+            .attr("class", "circle")
+            .attr("r", 10)
+            .style("fill", function(d){
+              return color(d.value.waveHeight);
+            });
 
-      // Add a label.
-      marker.append("svg:text")
-          .attr("x", 17)
-          .attr("y", 10)
-          .attr("dy", ".2em")
-          .text(function(d) { return d.value.properties.mag; });
-
-	//add rings
-
-
-						
-					
-					var path = d3.geo.path()
-						.projection(projection);
-
-					var graticule = d3.geo.graticule()
-						.step([5, 5]);
-
-
-					marker.append("circle")
-						.attr("class", "dot")
-						.attr("r", 2);
-
-					setInterval(function() {
-					  marker.append("circle")
-						  .attr("class", "ring")
-						  .attr("r", 3)
-						  .style("stroke-width", 3)
-						  .style("stroke", "red")
-						  .transition()
-						  .ease("linear")
-						  .duration(6000)
-						  .style("stroke-opacity", 1e-6)
-						  .style("stroke-width", 1)
-						  .style("stroke", "brown")
-						  .attr("r", map.getZoom() *5)
-						  .remove();
-					}, 750);
-
-      function transform(d) {
-        d = new google.maps.LatLng(d.value.geometry.coordinates[1], d.value.geometry.coordinates[0]);
+    function transform(d) {
+        
+        d = new google.maps.LatLng(d.value.lat,d.value.lon);
         d = googleProjection.fromLatLngToDivPixel(d);
         return d3.select(this)
             .style("left", (d.x - padding) + "px")
             .style("top", (d.y - padding) + "px");
-      }
+          }
+
     };
   };
 //end add rings					
@@ -345,7 +396,7 @@ playButton
 
 
 function paused() {
-console.log("paused");
+//console.log("paused");
   if (slider.node().__transition__) {
     slider.interrupt();
     this.textContent = "Play";
@@ -423,7 +474,7 @@ function brushed() {
 	  
 
 
-  // Bind our overlay to the map…
+  // Bind our overlay to the mapâ€¦
   overlay.setMap(map);
 });
 
