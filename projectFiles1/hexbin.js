@@ -4,9 +4,16 @@ var width = 950,
     dx = radius * 2 * 7 * 2 * Math.sin(Math.PI / 3),
     dy = radius * 2 * 11 * 1.5;
 
-var projection = d3.geo.mercator()
+/*var projection = d3.geo.mercator()
     .scale(175)
     .translate([width / 2, height / 2])
+    .precision(.1);
+*/
+var projection = d3.geo.conicEqualArea()
+    .scale(250)
+    .translate([width / 2, height / 2])
+    .center([0, 22])
+    .rotate([-20,0,0])
     .precision(.1);
 
 var path = d3.geo.path()
@@ -25,8 +32,8 @@ var colorGrowth = d3.scale.threshold()
     .domain([.02, .04, .06, .08, .10])
     .range(["#f6f7b9", "#d9f0a3", "#addd8e", "#78c679", "#31a354", "#006837"]);
 var colorCapita = d3.scale.threshold()
-    .domain([1000, 2000, 5000, 10000, 20000])
-    .range(["#edf8fb", "#ccece6", "#99d8c9", "#62c39a", "#2ca25f", "#006d2c"]);
+    .domain([1000, 2000, 5000, 10000, 20000,30000])
+    .range(["#edf8fb", "#ccece6", "#99d8c9", "#66c2a4", "#41ae76", "#238b45","#005824"]);
 
 var hexbin = d3.hexbin()
     .radius(radius)
@@ -52,11 +59,23 @@ d3.selectAll(".g-hexagon").append("path")
 
 queue()
     .defer(d3.json, "hexData.json")
+    .defer(d3.csv, "disasters.csv")
     .await(ready);
 
-function ready(error,topology) {
-    console.log(topology);
+function ready(error,topology, disasters) {
+    
    
+    disasters =disasters.map(function(d){
+	return {
+	    year: new Date(+d.year,0,1),
+	    lat:+d.lat,
+	    lon:+d.long,
+	    loss: +d.overallLosses,
+	    deaths: +d.fatalities,
+	    disaster: d.disaster
+	};
+    });
+
     topology.objects.gdp.geometries.forEach(rescale);
     topology.objects.pop.geometries.forEach(rescale);
 
@@ -151,6 +170,16 @@ defs.append("pattern")
       .attr("class", "g-boundary")
       .attr("d", path);
 
+    map.selectAll(".dot")
+	.data(disasters)
+	.enter()
+	.append("circle",".dot")
+        .attr("r",10)
+	.attr("transform",function(d){return "translate(" + projection([d.lon, d.lat])+")"})
+        .style("fill","#fed976")
+        .style("opacity",75)
+        .style("stroke", "#fc4e2a");
+
 var outline = map.append("g")
       .attr("class", "g-outline")
     .selectAll("path")
@@ -178,7 +207,7 @@ var outline = map.append("g")
     var  pop = map.filter(function(d) { return d.key === "pop"; }).attr("transform", "translate(0,70)");
 
   gdp.selectAll(".g-feature path")
-      .style("fill", function(d) { return isNaN(d.properties.gdpGrowth) ? null : colorGrowth(d.properties.gdpGrowth); });
+      .style("fill", function(d) { return isNaN(d.properties.gdpCap) ? null : colorCapita(d.properties.gdpCap); });
 
 // pop.selectAll(".g-feature path")
 //       .style("fill", function(d) { return isNaN(d.properties.gdpCap) ? null : colorCapita(d.properties.gdpCap2); });
@@ -191,14 +220,14 @@ var outline = map.append("g")
     var key = d3.select(this);
 
     var color;
-    if (d.key === "gdp") {
+    if (d.key === "usd") {
       color = colorGrowth;
       x.domain([0, .12]);
       xAxis.tickFormat(function(d) { return d === .10 ? formatWholePercent(d) : formatInteger(100 * d); });
     } else {
       color = colorCapita;
-      x.domain([0, 25000]);
-      xAxis.tickFormat(function(d) { return d === 20000 ? "$" + formatThousands(d) + "K" : formatThousands(d); });
+      x.domain([0, 40000]);
+      xAxis.tickFormat(function(d) { return d === 30000 ? "$" + formatThousands(d) + "K" : formatThousands(d); });
     }
 
     xAxis.tickValues(color.domain());
@@ -221,7 +250,7 @@ var outline = map.append("g")
         .attr("class", "g-caption")
         .attr("y", -6)
         .text(function(d, i) {
-          return d.key === "gdp"
+          return d.key === "usd"
               ? "G.D.P. growth, 2011 to 2012"
               : "G.D.P. per capita, 2012";
         });
