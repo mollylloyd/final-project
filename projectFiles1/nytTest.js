@@ -39,7 +39,7 @@ var xAxis = d3.svg.axis()
     .tickSize(13);
 
 var svg = d3.selectAll(".g-section")
-    .datum(function() { console.log(this); return this.getAttribute("data-key"); })
+    .datum(function() { return this.getAttribute("data-key"); })
   .append("svg")
     .attr("width", width)
     .attr("height", height);
@@ -53,9 +53,10 @@ queue()
     .await(ready);
 
 function ready(error, topology) {
+  console.log(topology);
   topology.objects.usd.geometries.forEach(rescale);
   topology.objects.pop.geometries.forEach(rescale);
-  console.log(topology);
+
   //console.log(topology.objects.usd.geometries[0].properties);
 
   function rescale(d) {
@@ -70,7 +71,7 @@ function ready(error, topology) {
   svg.datum(function(d) {
      
       var object = topology.objects[d];
-      console.log(object);
+      
       var countries = {type: "GeometryCollection", geometries: object.geometries};
       var countryCollection = topojson.object(topology, countries);
       //console.log(countryCollection);
@@ -78,7 +79,7 @@ function ready(error, topology) {
     countryCollection.geometries.forEach(measure);
     countryCollection.geometries.sort(descendingArea);
 
-    function measure(o) {
+    function measure(o,i) {
       o.properties.centroid = path.centroid(o);
       o.properties.area = path.area(o);
     }
@@ -104,7 +105,7 @@ function ready(error, topology) {
       .attr("stdDeviation", 3);
 
   defs.append("path")
-	.attr("id", function(d) { console.log(d); return "g-countries-" + d.key; })
+	.attr("id", function(d) {  return "g-countries-" + d.key; })
       .attr("d", function(d) { return path(d.countryCollection); });
 
   defs.append("clipPath")
@@ -118,7 +119,7 @@ function ready(error, topology) {
       .attr("id", "g-grid")
       .attr("width", dx)
       .attr("height", dy)
-      .attr("patternUnits", "userSpaceOnUse")
+     .attr("patternUnits", "userSpaceOnUse")
     .append("path")
       .attr("d", hexbin.mesh());
 

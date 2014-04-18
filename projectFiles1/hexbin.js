@@ -5,7 +5,7 @@ var width = 950,
     dy = radius * 2 * 11 * 1.5;
 
 var projection = d3.geo.mercator()
-    .scale(238)
+    .scale(175)
     .translate([width / 2, height / 2])
     .precision(.1);
 
@@ -61,25 +61,22 @@ function ready(error,topology) {
     topology.objects.pop.geometries.forEach(rescale);
 
     function rescale(d) {
-    	if (d.properties.gdpCap === null) d.properties.gdpCap = NaN;
-	   if (d.properties.pop === null) d.properties.pop = NaN;
-	   if (d.properties.gdpGrowth === null) d.properties.gdpGrowth = NaN;
+    //	if (d.properties.gdpCap === null) d.properties.gdpCap = NaN;
+	   //if (d.properties.pop === null) d.properties.pop = NaN;
+	   //if (d.properties.gdpGrowth === null) d.properties.gdpGrowth = NaN;
 	     d.properties.gdpGrowth *= 1e-2;
     };
 
     svg.datum(function(d){
-	
       var object = topology.objects[d];
-	     console.log(object);
       var countries = {type: "GeometryCollection", geometries: object.geometries};
       var countryCollection = topojson.object(topology, countries);
-      console.log(countryCollection);
 
-    countryCollection.geometries.forEach(measure);
-    countryCollection.geometries.sort(descendingArea);
+      countryCollection.geometries.forEach(measure);
+      countryCollection.geometries.sort(descendingArea);
 
-    function measure(o) {
-	
+    function measure(o,i) {
+      if (i==1) console.log(o);
       o.properties.centroid = path.centroid(o);
       o.properties.area = path.area(o);
     }
@@ -107,19 +104,20 @@ defs.append("filter")
       .attr("stdDeviation", 3);
 
   defs.append("path")
-	.attr("id", function(d) { return "g-countries-" + d.key; })
+	    .attr("id", function(d) { return "g-countries-" + d.key; })
       .attr("d", function(d) { return path(d.countryCollection); });
 
   defs.append("clipPath")
       .attr("id", function(d) { return "g-clip-" + d.key; })
     .append("use")
       .attr("xlink:href", function(d) { return "#g-countries-" + d.key; });
+
 defs.append("pattern")
       .attr("id", "g-grid")
       .attr("width", dx)
       .attr("height", dy)
       .attr("patternUnits", "userSpaceOnUse")
-    .append("path")
+      .append("path")
       .attr("d", hexbin.mesh());
 
   map.append("g")
@@ -136,7 +134,7 @@ defs.append("pattern")
     .selectAll("path")
       .data(function(d) { return d.countryCollection.geometries; })
     .enter().append("path")
-	.attr("d", path);
+	 .attr("d", path);
       //.on("mouseenter", showTooltip)
       //.on("mouseleave", hideTooltipSoon);
 
@@ -172,18 +170,18 @@ var outline = map.append("g")
         return "translate(" + c + ")";
       })
       .attr("dy", ".35em")
-	.text(function(d) { return d.properties.name; });
+	//.text(function(d) { return d.properties.name; });
       //.on("mouseenter", showTooltip)
       //.on("mouseleave", hideTooltipSoon);
 
     var gdp = map.filter(function(d) { return d.key === "gdp"; }).attr("transform", "translate(0,40)");
-     var  pop = map.filter(function(d) { return d.key === "pop"; }).attr("transform", "translate(0,70)");
+    var  pop = map.filter(function(d) { return d.key === "pop"; }).attr("transform", "translate(0,70)");
 
   gdp.selectAll(".g-feature path")
       .style("fill", function(d) { return isNaN(d.properties.gdpGrowth) ? null : colorGrowth(d.properties.gdpGrowth); });
 
-pop.selectAll(".g-feature path")
-      .style("fill", function(d) { return isNaN(d.properties.gdpCap) ? null : colorCapita(d.properties.gdpCap2); });
+// pop.selectAll(".g-feature path")
+//       .style("fill", function(d) { return isNaN(d.properties.gdpCap) ? null : colorCapita(d.properties.gdpCap2); });
 
   var key = svg.append("g")
       .attr("class", "g-key")
@@ -193,7 +191,7 @@ pop.selectAll(".g-feature path")
     var key = d3.select(this);
 
     var color;
-    if (d.key === "usd") {
+    if (d.key === "gdp") {
       color = colorGrowth;
       x.domain([0, .12]);
       xAxis.tickFormat(function(d) { return d === .10 ? formatWholePercent(d) : formatInteger(100 * d); });
@@ -223,7 +221,7 @@ pop.selectAll(".g-feature path")
         .attr("class", "g-caption")
         .attr("y", -6)
         .text(function(d, i) {
-          return d.key === "usd"
+          return d.key === "gdp"
               ? "G.D.P. growth, 2011 to 2012"
               : "G.D.P. per capita, 2012";
         });
