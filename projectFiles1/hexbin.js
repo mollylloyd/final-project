@@ -1,6 +1,6 @@
 var width = 950,
     height = 920,
-    radius = 3.546,
+    radius = 2.546,
     dx = radius * 2 * 7 * 2 * Math.sin(Math.PI / 3),
     dy = radius * 2 * 11 * 1.5;
 
@@ -76,7 +76,7 @@ function ready(error,topology) {
       countryCollection.geometries.sort(descendingArea);
 
     function measure(o,i) {
-      if (i==1) console.log(o);
+    
       o.properties.centroid = path.centroid(o);
       o.properties.area = path.area(o);
     }
