@@ -4,9 +4,15 @@ var width = 950,
     dx = radius * 2 * 7 * 2 * Math.sin(Math.PI / 3),
     dy = radius * 2 * 11 * 1.5;
 
-var projection = d3.geo.mercator()
-    .scale(175)
+// var projection = d3.geo.mercator()
+//     .scale(175)
+//     .translate([width / 2, height / 2])
+//     .precision(.1);
+
+var projection = d3.geo.conicEqualArea()
+    .scale(225)
     .translate([width / 2, height / 2])
+    .center([10, 50])
     .precision(.1);
 
 var path = d3.geo.path()
