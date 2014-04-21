@@ -7,6 +7,7 @@ var width = 950,
 /*var projection = d3.geo.mercator()
     .scale(175)
     .translate([width / 2, height / 2])
+    .center([10, 50])
     .precision(.1);
 */
 var projection = d3.geo.conicEqualArea()
