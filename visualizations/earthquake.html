@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no"/>
+    <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=true"></script>
+    <script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,600,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="style.css" media="all"/>
+</head>
+<body>
+<div id="map"></div>
+<script type="text/javascript">
+// Create the Google Map
+var map = new google.maps.Map(d3.select("#map").node(), {
+    zoom: 6,
+    //Center on Earthquake Epicenter
+    center: new google.maps.LatLng(39, 142.5),
+    mapTypeControl: false,
+    zoomControl: false,
+    draggable: false,
+    scrollwheel: false,
+    disableDoubleClickZoom: true,
+    mapTypeId: google.maps.MapTypeId.ROADMAP,
+    disableDefaultUI: true
+});
+
+var googleProjection,
+    quakePadding = 200,
+    earthquakesLayer;
+
+var currentDate = new Date();
+var startDate = new Date();
+var endDate = new Date();
+	
+//begin basemap styles
+var styles = [
+    {
+        stylers: [
+            { hue: "#0099CC" },
+            { saturation: -50}
+        ]
+    },
+    {
+        featureType: "road",
+        elementType: "geometry",
+        stylers: [
+            { lightness: 100 },
+            { visibility: "off" }
+        ]
+    },
+    {
+        featureType: "road",
+        elementType: "labels",
+        stylers: [
+            { visibility: "off" }
+        ]
+    },
+    {
+        featureType: "landscape",
+        elementType: "all",
+        stylers: [
+            {visibility: "on"},
+            {color: "#CCCCCC"},
+            {saturation: -50}
+        ]
+    },
+    {
+        featureType: "administrative.locality",
+        elementType: "labels",
+        stylers: [
+            {visibility: "off"}
+        ]
+    },
+    {
+        featureType: "administrative.province",
+        elementType: "geometry.stroke",
+        stylers: [
+            {visibility: "off"}
+        ]
+    },
+    {
+        featureType: "administrative.province",
+        elementType: "geometry",
+        stylers: [
+            {hue: "#0D0D0D"},
+            {saturation: 100}
+        ]
+    }
+];
+//end map styles
+
+//addDays date function
+Date.prototype.addDays = function(days)
+{
+    var dat = new Date(this.valueOf());
+    dat.setDate(dat.getDate() + days);
+    return dat;
+}
+
+//Quake Color
+var quakeColor = d3.scale.linear()
+    .domain([4, 9])
+    .range(["white", "red"])
+    .interpolate(d3.interpolateLab);
+
+//apply map styles to the map
+map.setOptions({styles: styles});
+
+// Load the quakes data. When the data comes back, create an overlay.
+d3.json("../data/earthquakes.json", function (error, earthquake_data) {
+    var overlay = new google.maps.OverlayView();
+
+	//set the min and max dates
+	sortedData = earthquake_data.features;
+	sortedData.sort(function(a, b){return a.properties.time - b.properties.time;})
+	startDate = new Date(sortedData[0].properties.time);
+	var dataLength = sortedData.length;
+	endDate = new Date(sortedData[dataLength-1].properties.time);
+
+    // Add the container when the overlay is added to the map.
+    overlay.onAdd = function () {
+        earthquakesLayer = d3.select(overlay.getPanes().overlayLayer).append("div")
+            .attr("class", "quakes");
+			addEarthquakes(sortedData);
+        overlay.draw = function () {
+            googleProjection = overlay.getProjection();
+        };
+    };
+    overlay.setMap(map);
+});
+
+// Earthquakes
+
+function addEarthquakes(data) {
+
+    quakes = earthquakesLayer.attr("class", "quakes");
+	var transition = d3.transition()
+		.duration(500)
+		.ease("linear");
+	
+	var legendHtml = "<h3>Legend</h3><br><div class='legendBox' style='opacity:1;'></div><div class='legendLabel'></div><br><div class='legendBox' style='opacity:.84;'></div><div class='legendLabel'></div><br><div class='legendBox' style='opacity:.67;'></div><div class='legendLabel'></div><br><div class='legendBox' style='opacity:.5;'></div><div class='legendLabel'></div><br><div class='legendBox' style='opacity:.33;'></div><div class='legendLabel'></div>";
+	
+	var earthquakeLegend = earthquakesLayer.append("div")
+        .attr("class", "legend");
+	
+	earthquakeLegend.html(legendHtml);
+	
+	var timeout = 0;
+	var i = 1;
+	var circle;
+
+	function dataLoop () {     
+	   setTimeout(function () {
+		    timeout = (data[i+1].properties.time - data[i].properties.time)/3600
+		    //console.log(i+" date = "+new Date(data[i].properties.time).toUTCString()+"  timeout = "+timeout+" mag = "+data[i].properties.mag);
+
+			d = new google.maps.LatLng(data[i].geometry.coordinates[1], data[i].geometry.coordinates[0]);
+			d = googleProjection.fromLatLngToDivPixel(d);
+
+			//add circles
+			quake = earthquakesLayer.append("svg")
+				.attr("class", "quake")
+				.style("left", (d.x - quakePadding) + "px")
+				.style("top", (d.y - quakePadding) + "px");
+				
+				
+			circle = quake.append("circle")
+				.attr("class", "quake-circle")
+				.attr("r", 2)
+				.transition()
+				  .duration(1500)
+				  .attr("r", Math.pow(1.7,data[i].properties.mag))
+				  .style("opacity", 0)
+				  .remove();
+			
+
+			rings = quake.append("circle")
+			    .attr("class", "ring")
+				.attr("r", 2)
+				.style("stroke-width", .5)
+				.transition()
+				  .ease("linear")
+				  .duration(1500)
+				  .style("stroke-opacity", 1e-6)
+				  .style("stroke-width", 2)
+				  .attr("r",Math.pow(2,data[i].properties.mag))
+				  .remove();
+
+		  i++;
+		  if (i < data.length -1) { 
+			 dataLoop();
+		  }
+	   }, timeout)
+	}
+	
+	//Start the animation
+	dataLoop(); 
+}
+</script>
+</body>
+</html>
