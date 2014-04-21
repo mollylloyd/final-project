@@ -10,6 +10,7 @@
 </head>
 <body>
 <div id="map"></div>
+
 <script type="text/javascript">
 // Create the Google Map
 var map = new google.maps.Map(d3.select("#map").node(), {
@@ -27,12 +28,16 @@ var map = new google.maps.Map(d3.select("#map").node(), {
 
 var googleProjection,
     quakePadding = 200,
-    earthquakesLayer;
+    earthquakesLayer,
+	dataLength,
+	timeMarker;
 
 var currentDate = new Date();
 var startDate = new Date();
 var endDate = new Date();
-	
+
+var speed = 7200;
+
 //begin basemap styles
 var styles = [
     {
@@ -100,8 +105,8 @@ Date.prototype.addDays = function(days)
 
 //Quake Color
 var quakeColor = d3.scale.linear()
-    .domain([4, 9])
-    .range(["white", "red"])
+    .domain([5, 60])
+    .range(["#FF3300", "#800000"])
     .interpolate(d3.interpolateLab);
 
 //apply map styles to the map
@@ -115,7 +120,7 @@ d3.json("../data/earthquakes.json", function (error, earthquake_data) {
 	sortedData = earthquake_data.features;
 	sortedData.sort(function(a, b){return a.properties.time - b.properties.time;})
 	startDate = new Date(sortedData[0].properties.time);
-	var dataLength = sortedData.length;
+	dataLength = sortedData.length;
 	endDate = new Date(sortedData[dataLength-1].properties.time);
 
     // Add the container when the overlay is added to the map.
@@ -150,10 +155,13 @@ function addEarthquakes(data) {
 	var i = 1;
 	var circle;
 
+	
+
+	
 	function dataLoop () {     
 	   setTimeout(function () {
-		    timeout = (data[i+1].properties.time - data[i].properties.time)/3600
-		    //console.log(i+" date = "+new Date(data[i].properties.time).toUTCString()+"  timeout = "+timeout+" mag = "+data[i].properties.mag);
+		    timeout = (data[i+1].properties.time - data[i].properties.time)/speed
+		    //console.log(i+" date = "+new Date(data[i].properties.time).toUTCString()+"  timeout = "+timeout+" mag = "+data[i].properties.mag+" depth = "+data[i].geometry.coordinates[2]);
 
 			d = new google.maps.LatLng(data[i].geometry.coordinates[1], data[i].geometry.coordinates[0]);
 			d = googleProjection.fromLatLngToDivPixel(d);
@@ -167,25 +175,51 @@ function addEarthquakes(data) {
 				
 			circle = quake.append("circle")
 				.attr("class", "quake-circle")
-				.attr("r", 2)
+				.attr("r", 4)
+				.style("fill", function (d) {
+					return quakeColor(data[i].geometry.coordinates[2])
+				})
 				.transition()
-				  .duration(1500)
+			     .duration(2500)
 				  .attr("r", Math.pow(1.7,data[i].properties.mag))
-				  .style("opacity", 0)
+				  .style("opacity", .1)
 				  .remove();
 			
 
+
+			
 			rings = quake.append("circle")
 			    .attr("class", "ring")
 				.attr("r", 2)
 				.style("stroke-width", .5)
+				.style("stroke", function (d) {
+					return quakeColor(data[i].geometry.coordinates[2])
+				})
 				.transition()
 				  .ease("linear")
 				  .duration(1500)
-				  .style("stroke-opacity", 1e-6)
-				  .style("stroke-width", 2)
+				  .style("stroke-opacity", 0.00001)
+				  .style("stroke-width", 1)
 				  .attr("r",Math.pow(2,data[i].properties.mag))
 				  .remove();
+				  
+			//add a bar to the chart  
+
+		    barSvg.append("rect")
+		      .attr("class", "bar")
+			  .attr("id", i)
+			  .attr("x", x(new Date(data[i].properties.time)) )
+			  .attr("width", 1)
+			  .on("click", function(d){d3.selectAll("rect").remove(); dataLoop(this.id);}) 
+			  .attr("y", function(d) { return y(data[i].properties.mag); })
+			  .attr("height", function(d) { return height - y(data[i].properties.mag); });
+				  
+			timeMarker.attr("cx", x(new Date(data[i].properties.time)))
+				 .transition()
+				  .ease("linear")
+				  .duration(timeout)
+				  .attr("cx", x(new Date(data[i+1].properties.time)))  
+				  
 
 		  i++;
 		  if (i < data.length -1) { 
@@ -194,8 +228,77 @@ function addEarthquakes(data) {
 	   }, timeout)
 	}
 	
+
+	
+	
+	
+
+	
+	
+	//chart
+	
+	var margin = {top: 20, right: 20, bottom: 30, left: 40},
+    width = 900 - margin.left - margin.right,
+    height = 100 - margin.top - margin.bottom;
+
+	
+	
+var x = d3.time.scale()
+		.domain([startDate, endDate])
+		.range([0, width]);
+
+var y = d3.scale.linear()
+        .domain([0,10])
+        .range([height, 0]);
+
+var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient("bottom")
+	.tickFormat(d3.time.format("%b %d %x"));
+
+	
+
+var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left")
+    .ticks(5);
+
+var barSvg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+	.append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+
+  barSvg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis);
+
+  barSvg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+    .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", -30)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("Magnitude");
+
+	
+	//console.log(x(endDate.getTime()));// - x(startDate.getTime()));
+	
+	timeMarker = barSvg.append("circle")
+	.attr("r",3)
+	.attr("cy", 50)
+	.attr("class", "quake-circle");
+
+
+
 	//Start the animation
-	dataLoop(); 
+	dataLoop(1); 
+
+	
 }
 </script>
 </body>
