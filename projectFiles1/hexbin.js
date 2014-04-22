@@ -14,7 +14,7 @@ var projection = d3.geo.conicEqualArea()
     .scale(250)
     .translate([width / 2, height / 2])
     .center([0, 22])
-    .rotate([-20,0,0])
+    .rotate([0,0,0])
     .precision(.1);
 
 var path = d3.geo.path()
@@ -175,10 +175,10 @@ defs.append("pattern")
 	.data(disasters)
 	.enter()
 	.append("circle",".dot")
-        .attr("r",10)
+        .attr("r",15)
 	.attr("transform",function(d){return "translate(" + projection([d.lon, d.lat])+")"})
         .style("fill","#fed976")
-        .style("opacity",75)
+        .style("opacity",.75)
         .style("stroke", "#fc4e2a");
 
 var outline = map.append("g")
