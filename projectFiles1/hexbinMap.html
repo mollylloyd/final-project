@@ -76,8 +76,8 @@ axis text {
 }
 
 .g-outline .g-active {
-  stroke: orange;
-  stroke-width: 1.5px;
+  stroke: grey;
+  stroke-width: 1px;
 }
 
 .g-boundary {
@@ -231,8 +231,8 @@ axis text {
 <script src="topojson.js"></script>
   
 <div id="options">
-  <input name="econButton" type="button" value="Economic Losses" onclick="econLayout()"/>
-  <input name="deathButton" type="button" value="Fatalities" onclick="deathLayout()" />
+  <button id="econButton">Economic Losses</button>
+  <button id="deathButton">Fatalities</button>
 </div>
 
    <div id="g-graphic">

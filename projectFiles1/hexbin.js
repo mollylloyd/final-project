@@ -181,15 +181,15 @@ map.append("g")
       .attr("class", "g-boundary")
       .attr("d", path);
 
-   var deathScale = d3.scale.pow().exponent(2)
+var deathScale = d3.scale.pow().exponent(1.5)
 	.domain([d3.min(disasters.map(function(d) {return d.deaths;})),
 	         d3.max(disasters.map(function(d) {return d.deaths;}))])
-	.range([5,25]);
+	.range([5,30]);
 
-    var econScale = d3.scale.pow().exponent(2)
+var econScale = d3.scale.pow().exponent(1.5)
 	.domain([d3.min(disasters.map(function(d) {return d.loss;})),
 	         d3.max(disasters.map(function(d) {return d.loss;}))])
-        .range([5,25]);
+        .range([5,30]);
 
     
 
