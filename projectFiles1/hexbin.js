@@ -46,8 +46,8 @@ var svg = d3.selectAll(".g-section")
     .attr("width", width)
     .attr("height", height);
 
-d3.selectAll(".g-hexagon").append("path")
-    .attr("d", hexbin.hexagon());
+// d3.selectAll(".g-hexagon").append("path")
+//     .attr("d", hexbin.hexagon());
 
 
 queue()
@@ -56,19 +56,15 @@ queue()
     .await(ready);
 
 function ready(error,topology, disasters) {
-    
-   
-
-
     disasters =disasters.map(function(d){
-	return {
-	    year: new Date(+d.year,0,1),
+	   return {
+	    year: +d.year,
 	    lat:+d.lat,
 	    lon:+d.long,
 	    loss: +d.overallLosses,
 	    deaths: +d.fatalities,
 	    disaster: d.disaster
-	};
+	     };
     });
 
     topology.objects.gdp.geometries.forEach(rescale);
@@ -132,17 +128,17 @@ defs.append("pattern")
       .attr("width", dx)
       .attr("height", dy)
       .attr("patternUnits", "userSpaceOnUse")
-      .append("path")
-      .attr("d", hexbin.mesh());
+      .append("path");
+      //.attr("d", hexbin.mesh());
 
-  map.append("g")
-      .attr("class", "g-halo")
-    .selectAll("path")
-      .data(function(d) { return d.countryCollection.geometries; })
-    .enter().append("path")
-      .attr("d", path)
-      .on("mouseenter", showTooltip)
-      .on("mouseleave", hideTooltip);
+  // map.append("g")
+  //     .attr("class", "g-halo")
+  //   .selectAll("path")
+  //     .data(function(d) { return d.countryCollection.geometries; })
+  //   .enter().append("path")
+  //     .attr("d", path)
+  //     .on("mouseenter", showTooltip)
+  //     .on("mouseleave", hideTooltip);
 
   map.append("g")
       .attr("class", "g-feature")
@@ -187,9 +183,71 @@ var circles = map.selectAll(".dot")
 	.attr("transform",function(d){return "translate(" + projection([d.lon, d.lat])+")"})
         .style("fill","#666699")
         .style("opacity",.75)
-        .style("stroke", "#FFFFFF");
+        .style("stroke", "#FFFFFF")
+  .on("mouseenter", showDisasterTT);
+  //.on("mouseleave", hideDisasterTT);
 
-var clicked;
+var circleKey = svg.append("g")
+      .attr("class","g-key")
+      .attr("transform","translate(100,55)");
+
+var econFill = "#33AD5C";
+var deathFill = "#FF7519";
+
+var econLabels = circleKey
+      .selectAll(".dot")
+      .data([1000,50000,100000,200000])
+      .enter()
+      .append("circle",".dot")
+      .attr("transform", function (d,i) { return "translate ("+ (40 * i ) + "," + (-1*econScale(d))+")";})
+      .style("fill", econFill)
+      .style("opacity",.75)
+      .attr("id","econ")
+      .attr("r",function(d){
+        return econScale(d);
+        })
+      .style("display","none");
+
+var econText = circleKey.append("g")
+    .selectAll("text")
+    .attr("class","g-label")
+    .attr("id","econText")
+    .data([1000,50000,100000,200000])
+    .enter()
+    .append("text")
+    .attr("y",20)
+    .attr("transform", function (d,i) {
+      return "translate ("+ (40*i - 13)+ ",0)";})
+    .text(function(d){
+       return "$" + (d/1000) + "B";})
+    .style("display","none");
+
+var deathLabels = circleKey.selectAll(".dot")
+      .data([1000,50000,100000,200000])
+      .enter()
+      .append("circle",".dot")
+      .attr("transform", function (d,i) { return "translate ("+ (40 * i ) + "," + (-1*deathScale(d))+")";})
+      .style("fill", deathFill)
+      .style("opacity",.75)
+      .attr("r",function(d){
+        return deathScale(d);
+        })
+      .style("display","none");
+
+var deathText = circleKey.append("g")
+    .selectAll("text")
+    .attr("class","g-label")
+    .data([1000,50000,100000,200000])
+    .enter()
+    .append("text")
+    .attr("y",20)
+    .attr("transform", function (d,i) {
+      return "translate ("+ (40*i - 10)+ ",0)";})
+    .text(function(d){
+       return (d/1000) + "k";})
+    .style("display","none");
+
+var click;
 
 d3.select("#econButton")
 	.on("click", econClick);
@@ -198,79 +256,53 @@ d3.select("#deathButton")
 	.on("click", deathClick);
 
 
-
 function econClick(d){
 
-  var fill = "#33AD5C";
   circles.transition()
        .attr("r",function(d){
         return econScale(d.loss)})
-       .style("fill", fill);
+       .style("fill", econFill);
 
-var circleKey = svg.append("g")
-      .attr("class","g-key")
-      .attr("transform","translate(100,55)");
+    econLabels.transition()
+      .style("display", null);
 
-var labels = circleKey.selectAll(".dot")
-      .data([1000,50000,100000,200000])
-      .enter()
-      .append("circle",".dot")
-      .attr("transform", function (d,i) { return "translate ("+ (40 * i ) + "," + (-1*econScale(d))+")";})
-      .style("fill", fill)
-      .style("opacity",.75)
-      .attr("r",function(d){
-        return econScale(d);
-        });
+    econText.transition()
+      .style("display",null);
 
-circleKey.append("g")
-    .selectAll("text")
-    .attr("class","g-label")
-    .data([1000,50000,100000,200000])
-    .enter()
-    .append("text")
-    .attr("y",20)
-    .attr("transform", function (d,i) {
-      return "translate ("+ (40*i - 13)+ ",0)";})
-    .text(function(d){
-       console.log(d);
-       return "$" + (d/1000) + "B";});
+  if (click=="death"){
+    deathText.transition()
+      .style("display","none");
+    deathLabels.transition()
+      .style("display","none");
+    };
 
-}
+  click = "econ";
+  console.log(click);
+};
+
 
 function deathClick(d) {
-  var fill = "#FF7519";
+
   circles.transition()
        .attr("r",function(d){
         return deathScale(d.deaths)})
-       .style("fill",fill);
+       .style("fill",deathFill);
+  deathLabels.transition()
+    .style("display",null);
+  deathText.transition()
+    .style("display",null);
 
-  var circleKey = svg.append("g")
-      .attr("class","g-key")
-      .attr("transform","translate(100,55)");
+  if (click == "econ"){
+    econText.transition()
+      .style("display","none");
+    econLabels.transition()
+      .style("display","none");
+  };
 
-  var labels = circleKey.selectAll(".dot")
-      .data([1000,50000,100000,200000])
-      .enter()
-      .append("circle",".dot")
-      .attr("transform", function (d,i) { return "translate ("+ (40 * i ) + "," + (-1*deathScale(d))+")";})
-      .style("fill", fill)
-      .style("opacity",.75)
-      .attr("r",function(d){
-        return deathScale(d);
-        });
+  click = "death";
+  console.log(click);
+};
 
-circleKey.append("g")
-    .selectAll("text")
-    .attr("class","g-label")
-    .data([1000,50000,100000,200000])
-    .enter()
-    .append("text")
-    .attr("y",20)
-    .attr("transform", function (d,i) {
-      return "translate ("+ (40*i - 13)+ ",0)";})
-    .text(function(d){
-       return (d/1000) + "k";});
-}
 
 var outline = map.append("g")
       .attr("class", "g-outline")
@@ -305,7 +337,7 @@ var outline = map.append("g")
 
     key.selectAll("rect")
         .data(color.range().map(function(d, i) {
-          console.log(color.domain()[i - 1]);
+          
           return {
             x0: i ? x(color.domain()[i - 1]) : x.range()[0],
             x1: i < color.domain().length ? x(color.domain()[i]) : x.range()[1],
@@ -343,10 +375,54 @@ tooltip.append("path")
 tooltip.append("path")
   .attr("class","g-box")
   .attr("d", "M-100,0 h 90l10,-10l10,10h90v110h-200z");
+
 tooltip.append("text")
       .attr("class", "g-title")
       .attr("x", -90)
       .attr("y", 20);
+
+var tooltipDisasters = d3.select("#g-graphic").append("svg")
+    .attr("width","240")
+    .attr("height","140")
+    .attr("viewBox","-120,-20,240,140")
+    .style("margin-left","-120px")
+    .attr("class","g-tooltip")
+    .style("display","none");
+
+tooltipDisasters.append("path")
+      .attr("class", "g-shadow")
+      .attr("d", "M-100,0h90l10,-10l10,10h90v90h-200z");
+
+tooltipDisasters.append("path")
+  .attr("class","g-box")
+  .attr("d", "M-100,0 h 90l10,-10l10,10h90v90h-200z");
+
+tooltipDisasters.append("text")
+      .attr("class", "g-title")
+      .attr("x", -90)
+      .attr("y", 20);
+
+var disasterTT = tooltipDisasters.selectAll(".g-row")
+                  .data([
+                    {name:"Year", key:"year"},
+                    {name:"Total Fatalities", key:"deaths"},
+                    {name:"Total Economic Losses", key:"loss"}])
+                  .enter()
+                  .append("g")
+                  .attr("class",function(d){return "g-row g-" + d.key;})
+                  .attr("transform", function(d,i){return "translate(-90,"  + (i * 17 + 38.5) + ")"; });
+disasterTT.append("text")
+    .attr("class","g-name")
+    .text(function(d){ return d.name; });
+
+disasterTT.append("text")
+  .attr("x",180)
+  .attr("class","g-number");
+disasterTT.append("line")
+  .attr("y1",4)
+  .attr("y2",4)
+  .attr("x2",180);
+
 
 var tooltipRow = tooltip.selectAll(".g-row")
       .data([
@@ -372,10 +448,20 @@ var tooltipRow = tooltip.selectAll(".g-row")
       .attr("y2", 4)
       .attr("x2", 180);
 
+function showDisasterTT(d){
+  var center = projection([d.lon,d.lat]);
+  console.log(center)
+  tooltipDisasters.style("display", null)
+    .style("left", center[0] + "px")
+    .style("top",  (center[1] + 14) + "px");
+
+  tooltipDisasters.select(".g-year .g-number").text(d.year)
+}
+
 function showTooltip(d){
 
   var centroid = d.properties.centroid,
-        offsetY = this.ownerSVGElement.parentNode.offsetTop + (gdp.node().compareDocumentPosition(this) & 16 ? 60 : 90);
+      offsetY = this.ownerSVGElement.parentNode.offsetTop + (gdp.node().compareDocumentPosition(this) & 16 ? 60 : 90);
 
     outline.classed("g-active", function(p) { return p === d; }); 
        
@@ -385,7 +471,7 @@ function showTooltip(d){
         .style("top", centroid[1] + offsetY + "px");
 
     
-tooltip.select(".g-gdp .g-number").text(isNaN(d.properties.gdpCap*d.properties.pop) ? "N/A" : formatUsdBillion(d.properties.gdpCap*d.properties.pop));
+    tooltip.select(".g-gdp .g-number").text(isNaN(d.properties.gdpCap*d.properties.pop) ? "N/A" : formatUsdBillion(d.properties.gdpCap*d.properties.pop));
     tooltip.select(".g-change .g-number").text(isNaN(d.properties.gdpGrowth) ? "N/A" : formatPercent(d.properties.gdpGrowth));
     tooltip.select(".g-capita .g-number").text(isNaN(d.properties.gdpCap) ? "N/A" : formatUsd(d.properties.gdpCap));
     tooltip.select(".g-pop .g-number").text(isNaN(d.properties.pop) ? "N/A" : formatPop(d.properties.pop));
@@ -393,8 +479,9 @@ tooltip.select(".g-gdp .g-number").text(isNaN(d.properties.gdpCap*d.properties.p
     //tooltip.select(".g-click").style("display", d.id === "CN" ? null : "none");
     tooltip.select(".g-title").text(d.properties.country);
 
-}
-  function hideTooltip() {
+  };
+
+function hideTooltip() {
     tooltip.style("display", "none");
     outline.classed("g-active", false);
   }
