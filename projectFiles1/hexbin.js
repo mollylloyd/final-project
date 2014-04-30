@@ -449,7 +449,7 @@ function showDisasterTT(d){
     .style("top",  (center[1] + 14) + "px");
 
   tooltipDisasters.select(".g-year .g-number").text(d.year);
-  tooltipDisasters.select(".g-deaths .g-number").text(formatThousands(d.deaths));
+  tooltipDisasters.select(".g-deaths .g-number").text(formatInteger(d.deaths));
   tooltipDisasters.select(".g-loss .g-number").text(formatUsdMillion(d.loss));
 
   tooltipDisasters.select(".g-title").text(d.disaster);
