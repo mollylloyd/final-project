@@ -20,6 +20,7 @@ var formatWholePercent = d3.format("+.0%"),
     formatDecimal = d3.format(".1f"),
     formatThousands = function(d) { return formatInteger(d * 1e-3); },
     formatUsdBillion = function(d) { return "$" + (d < 1e10 ? formatDecimal : formatInteger)(d / 1e9) + " billion"; },
+    formatUsdMillion = function(d) { return "$" + formatInteger(d) + " mil"; },
     formatUsd = function(d) { return "$" + formatInteger(d); },
     formatPop = function(d) { return (d < 1e7 ? formatDecimal : formatInteger)(d / 1e6) + " million"; };
 
@@ -131,14 +132,6 @@ defs.append("pattern")
       .append("path");
       //.attr("d", hexbin.mesh());
 
-  // map.append("g")
-  //     .attr("class", "g-halo")
-  //   .selectAll("path")
-  //     .data(function(d) { return d.countryCollection.geometries; })
-  //   .enter().append("path")
-  //     .attr("d", path)
-  //     .on("mouseenter", showTooltip)
-  //     .on("mouseleave", hideTooltip);
 
   map.append("g")
       .attr("class", "g-feature")
@@ -162,12 +155,12 @@ map.append("g")
       .attr("class", "g-boundary")
       .attr("d", path);
 
-var deathScale = d3.scale.pow().exponent(1.5)
+var deathScale = d3.scale.pow().exponent(2)
 	.domain([d3.min(disasters.map(function(d) {return d.deaths;})),
 	         d3.max(disasters.map(function(d) {return d.deaths;}))])
 	.range([5,30]);
 
-var econScale = d3.scale.pow().exponent(1.5)
+var econScale = d3.scale.pow().exponent(2)
 	.domain([d3.min(disasters.map(function(d) {return d.loss;})),
 	         d3.max(disasters.map(function(d) {return d.loss;}))])
         .range([5,30]);
@@ -184,15 +177,15 @@ var circles = map.selectAll(".dot")
         .style("fill","#666699")
         .style("opacity",.75)
         .style("stroke", "#FFFFFF")
-  .on("mouseenter", showDisasterTT);
-  //.on("mouseleave", hideDisasterTT);
+  .on("mouseenter", showDisasterTT)
+  .on("mouseleave", hideDisasterTT);
 
 var circleKey = svg.append("g")
       .attr("class","g-key")
       .attr("transform","translate(100,55)");
 
 var econFill = "#33AD5C";
-var deathFill = "#FF7519";
+var deathFill = "#66CCFF";
 
 var econLabels = circleKey
       .selectAll(".dot")
@@ -277,7 +270,7 @@ function econClick(d){
     };
 
   click = "econ";
-  console.log(click);
+
 };
 
 
@@ -300,7 +293,7 @@ function deathClick(d) {
   };
 
   click = "death";
-  console.log(click);
+  
 };
 
 
@@ -381,49 +374,6 @@ tooltip.append("text")
       .attr("x", -90)
       .attr("y", 20);
 
-var tooltipDisasters = d3.select("#g-graphic").append("svg")
-    .attr("width","240")
-    .attr("height","140")
-    .attr("viewBox","-120,-20,240,140")
-    .style("margin-left","-120px")
-    .attr("class","g-tooltip")
-    .style("display","none");
-
-tooltipDisasters.append("path")
-      .attr("class", "g-shadow")
-      .attr("d", "M-100,0h90l10,-10l10,10h90v90h-200z");
-
-tooltipDisasters.append("path")
-  .attr("class","g-box")
-  .attr("d", "M-100,0 h 90l10,-10l10,10h90v90h-200z");
-
-tooltipDisasters.append("text")
-      .attr("class", "g-title")
-      .attr("x", -90)
-      .attr("y", 20);
-
-var disasterTT = tooltipDisasters.selectAll(".g-row")
-                  .data([
-                    {name:"Year", key:"year"},
-                    {name:"Total Fatalities", key:"deaths"},
-                    {name:"Total Economic Losses", key:"loss"}])
-                  .enter()
-                  .append("g")
-                  .attr("class",function(d){return "g-row g-" + d.key;})
-                  .attr("transform", function(d,i){return "translate(-90,"  + (i * 17 + 38.5) + ")"; });
-disasterTT.append("text")
-    .attr("class","g-name")
-    .text(function(d){ return d.name; });
-
-disasterTT.append("text")
-  .attr("x",180)
-  .attr("class","g-number");
-disasterTT.append("line")
-  .attr("y1",4)
-  .attr("y2",4)
-  .attr("x2",180);
-
-
 var tooltipRow = tooltip.selectAll(".g-row")
       .data([
         {name: "G.D.P.", key: "gdp"},
@@ -448,16 +398,67 @@ var tooltipRow = tooltip.selectAll(".g-row")
       .attr("y2", 4)
       .attr("x2", 180);
 
+
+var tooltipDisasters = d3.select("#g-graphic").append("svg")
+    .attr("width","240")
+    .attr("height","140")
+    .attr("viewBox","-120,-20,240,100")
+    .style("margin-left","-120px")
+    .attr("class","g-tooltip")
+    .style("display","none");
+
+tooltipDisasters.append("path")
+      .attr("class", "g-shadow")
+      .attr("d", "M-100,0h90l10,-10l10,10h90v90h-200z");
+
+tooltipDisasters.append("path")
+  .attr("class","g-box")
+  .attr("d", "M-100,0 h 90l10,-10l10,10h90v90h-200z");
+
+tooltipDisasters.append("text")
+      .attr("class", "g-title")
+      .attr("transform", "translate(-90,20)");
+
+var disasterTT = tooltipDisasters.selectAll(".g-row")
+                  .data([
+                    {name:"Year", key:"year"},
+                    {name:"Total Fatalities", key:"deaths"},
+                    {name:"Total Economic Losses", key:"loss"}])
+                  .enter()
+                  .append("g")
+                  .attr("class",function(d){return "g-row g-" + d.key;})
+                  .attr("transform", function(d,i){return "translate(-90,"  + (i * 17 + 38.5) + ")"; });
+disasterTT.append("text")
+    .attr("class","g-name")
+    .text(function(d){ return d.name; });
+
+disasterTT.append("text")
+  .attr("x",180)
+  .attr("class","g-number");
+  
+disasterTT.append("line")
+  .attr("y1",4)
+  .attr("y2",4)
+  .attr("x2",180);
+
 function showDisasterTT(d){
   var center = projection([d.lon,d.lat]);
-  console.log(center)
+
   tooltipDisasters.style("display", null)
     .style("left", center[0] + "px")
     .style("top",  (center[1] + 14) + "px");
 
-  tooltipDisasters.select(".g-year .g-number").text(d.year)
+  tooltipDisasters.select(".g-year .g-number").text(d.year);
+  tooltipDisasters.select(".g-deaths .g-number").text(formatThousands(d.deaths));
+  tooltipDisasters.select(".g-loss .g-number").text(formatUsdMillion(d.loss));
+
+  tooltipDisasters.select(".g-title").text(d.disaster);
 }
 
+function hideDisasterTT(d){
+  tooltipDisasters.style("display","none");
+
+}
 function showTooltip(d){
 
   var centroid = d.properties.centroid,
@@ -476,7 +477,6 @@ function showTooltip(d){
     tooltip.select(".g-capita .g-number").text(isNaN(d.properties.gdpCap) ? "N/A" : formatUsd(d.properties.gdpCap));
     tooltip.select(".g-pop .g-number").text(isNaN(d.properties.pop) ? "N/A" : formatPop(d.properties.pop));
     
-    //tooltip.select(".g-click").style("display", d.id === "CN" ? null : "none");
     tooltip.select(".g-title").text(d.properties.country);
 
   };

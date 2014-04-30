@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+
+path {
+  fill: none;
+  stroke-linejoin: round;
+}
+
+.land {
+  fill: #ddd;
+}
+
+.states,
+.hexagons path {
+  stroke: #fff;
+}
+
+
+</style>
+<body>
+<script src="d3.v3.min.js"></script>
+<script src="http://d3js.org/d3.hexbin.v0.min.js"></script>
+<script src="http://d3js.org/d3.geo.projection.v0.min.js"></script>
+<script src="http://d3js.org/queue.v1.min.js"></script>
+<script src="http://d3js.org/topojson.v1.min.js"></script>
+<script src="topojson.js"></script>
+<div id="map">
+  <div class="g-section" data-key="japan"></div>
+</div>
+<script src="hexbinJapan.js"></script>
+
