@@ -23,12 +23,11 @@ var svg = d3.select(".g-section").append("svg")
 
 queue()
     .defer(d3.json, "japanStates.json")
-    .defer(d3.json, "us.json")
     .defer(d3.csv, "waveHeightJapan.csv")
-    .defer(d3.json, "hexData.json")
+    .defer(d3.csv, "deaths.csv")
     .await(ready);
 
-function ready(error,japan, us, wave, world) {
+function ready(error,japan, wave, deaths) {
 
     wave = wave.map(function(d){
 	return{
@@ -40,7 +39,20 @@ function ready(error,japan, us, wave, world) {
 	    state: d.State
 	};
     });
-
+    
+    deaths = deaths.map(function(d){
+	return {
+	    name: d.Prefecture,
+	    deaths: +d.Killed,
+	    missing: +d.Missing,
+	    injured: +d.TotalPeople,
+	    flooded: (+d.InnundatedAboveFloor + +d.InnundatedBelowFloor),
+	    buildingsDestroyed: +d.NonDwelling,
+	    housesCollapsed: +d.BuildingCollapse,
+	    housesPartiallyCollapsed:+d.PartialCollapse,
+	    housesDamaged: +d.PartiallyDamaged
+	};
+    })
 
     wave.forEach(function(d,i){
 	var p = projection([ d.lon,d.lat ]);
@@ -48,7 +60,8 @@ function ready(error,japan, us, wave, world) {
 	d[0] = p[0], d[1]=p[1];
 	
     });
-    //console.log(wave);
+   
+    console.log(deaths);
 
  //process topojson file
     var object = japan.objects.states;
@@ -56,18 +69,30 @@ function ready(error,japan, us, wave, world) {
     var stateCollection = topojson.object(japan,states);
     var features = topojson.object(japan, japan.objects.states);
     
+    
     //stateCollection.geometries.forEach(function(d){ d.properties ={};});
     
-    stateCollection.geometries.forEach(measure);
+     stateCollection.geometries.forEach(measure);
+     stateCollection.geometries.forEach(descendingArea);
+     
     
+
+    deaths.forEach(function(d) {
+	stateCollection.geometries.forEach(function(e) {
+	    if (d.name == e.properties.name) {
+		e.properties.deaths = d.deaths;
+		e.properties.missing = d.missing;
+		e.properties.injured = d.injured;
+		e.properties.flooded = d.flooded;
+	    }
+	})
+    });
 
     function measure(o,i) {
     
       o.properties.centroid = path.centroid(o);
       o.properties.area = path.area(o);
     }
-
-    stateCollection.geometries.forEach(descendingArea);
 
     function descendingArea(a, k) {
 	function meep (b,i){ if (i != k) {
@@ -80,7 +105,8 @@ function ready(error,japan, us, wave, world) {
 		   stateMesh: topojson.mesh(japan, object, function(a,b) {return a !== b;})
 		  };
 
-
+   
+    console.log(states);
     //svg.selectAll("path")
 //	.data(features.geometries)
 //	.enter()
