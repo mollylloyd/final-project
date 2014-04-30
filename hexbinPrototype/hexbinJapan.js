@@ -11,10 +11,11 @@ var projection = d3.geo.mercator()
 
 var path = d3.geo.path().projection(projection);
 
+var color = d3.scale.linear().domain([0,5,10,20,25]).range(["#FFCC00","red"]).interpolate(d3.interpolateLab);
 
 var hexbin = d3.hexbin()
     .size([width,height])
-    .radius(5);
+    .radius(4);
 
 var svg = d3.select(".g-section").append("svg")
     .attr("width",width)
@@ -89,9 +90,6 @@ function ready(error,japan, us, wave, world) {
 //	.attr("stroke-width","0.5")
 //	.attr("d", path);
     
-    console.log(japanStates);
-    console.log(japan.objects.states);
-
   svg.append("path")
 	.datum(japanStates.stateCollection)
 	.attr("class","land")
@@ -108,8 +106,35 @@ function ready(error,japan, us, wave, world) {
 	.data(hexbin(wave).sort(function(a, b) { return b.length - a.length;}))
 	.enter()
 	.append("path")
-	.attr("d",function(d){ return hexbin.hexagon(5)})
+	.attr("d",function(d){ return hexbin.hexagon(4)})
 	.attr("transform", function(d){ return "translate(" +d.x+ "," +d.y+ ")";})
-	.style("fill","blue");
-    
+	.style("fill",function(d){ return color(d3.mean(d, function(d) {return d.height})); });
+
+   var key = svg.append("g")
+        .attr("height", 30)
+        .attr("width", 30)
+      .attr("class", "g-key")
+      .attr("transform", function(d) { return "translate(720,30)"; });
+
+      key.selectAll("path")
+        .data([0,5,10,20,30])
+        .enter()
+        .append("path")
+        .attr("d", function (d){ return hexbin.hexagon(8)})
+        .attr("transform", function (d,i){ return "translate(" + 30*i + ", 0)";})
+        .style("fill", function (d){return color(d);});
+    key.selectAll("text")
+        .attr("class","g-label")
+        .data([0,5,10,20,30])
+        .enter()
+        .append("text")
+        .attr("y",20)
+        .attr("transform", function (d,i){ return "translate(" + (30*i-7) + ",0)";})
+        .text(function (d) {return d + "m" ;});
+
+    key.append("text")
+        .attr("class","g-caption")
+        .attr("y",-13)
+        .attr("x", 4)
+        .text("Maximum Wave Height");
 }//closes function ready()

@@ -47,8 +47,6 @@ var svg = d3.selectAll(".g-section")
     .attr("width", width)
     .attr("height", height);
 
-// d3.selectAll(".g-hexagon").append("path")
-//     .attr("d", hexbin.hexagon());
 
 
 queue()
@@ -119,10 +117,10 @@ defs.append("filter")
 	    .attr("id", function(d) { return "g-countries-" + d.key; })
       .attr("d", function(d) { return path(d.countryCollection); });
 
-  defs.append("clipPath")
-      .attr("id", function(d) { return "g-clip-" + d.key; })
-    .append("use")
-      .attr("xlink:href", function(d) { return "#g-countries-" + d.key; });
+  // defs.append("clipPath")
+  //     .attr("id", function(d) { return "g-clip-" + d.key; })
+  //   .append("use")
+  //     .attr("xlink:href", function(d) { return "#g-countries-" + d.key; });
 
 defs.append("pattern")
       .attr("id", "g-grid")
