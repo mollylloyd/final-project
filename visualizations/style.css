@@ -12,6 +12,25 @@ html, body {
 	height:500px;
 }
 
+ .labels {
+   color: red;
+   background-color: white;
+   font-family: "Lucida Grande", "Arial", sans-serif;
+   font-size: 10px;
+   font-weight: bold;
+   text-align: center;
+   width: 60px;     
+   border: 2px solid black;
+   white-space: nowrap;
+ }
+
+#radiationMap{
+	padding:50px;
+	width:836px;
+	height:500px;
+	  cursor:crosshair;
+}
+
 #date{
 background-color:yellow;
 position: absolute;
@@ -53,6 +72,7 @@ position: absolute;
 
 .radiation, .radiation svg {
   position: absolute;
+  
 }
 
 .radiation svg {
@@ -60,13 +80,30 @@ position: absolute;
 	width:800px;
 	height:500px;
 	font: 10px;
+	 border: 1px solid #bbbbbb;
 }
 
-.radiation quake-circle {
+.radiation-circle {
   stroke: black;
   stroke-width: 1px;
+  z-index:1;
 }
 
+.radiationInfo{
+	position:absolute;
+	left: 24px;
+	top: 168px;
+}
+
+.radiationInfo{
+	font-size: 12px;
+}
+.radiationInfo table .left{
+	text-align:right;
+}
+.radiationInfo table .center{
+	text-align:center;
+}
 .land {
   fill: #007421;
 }
@@ -110,6 +147,33 @@ position: absolute;
     margin-top:-3px;
 }
 
+/******************************
+ Radiation Chart
+ *****************************/
+
+ #radiationChart{
+	position: absolute;
+	width: 213px;
+	left: 675px;
+	top: 31px;
+	background: rgba(240, 224, 44, 0.7);
+	padding: 5px;
+	margin: 5px;
+	border: 1px solid;
+	border-radius: 10px;
+	box-shadow: 4px 4px 3px #888888;
+	
+}
+
+#geigerGaugeContainer{
+	position: absolute;
+	left: 43px;
+	top: 20px;
+
+}
+
+.radiation-circle{
+}
 /******************************
  Bar Chart
  *****************************/
@@ -162,6 +226,18 @@ position: absolute;
 	left: 59px;
 	top: 14px;
 	z-index:1;
+}
+
+.startButton1{
+    background:url(images/play1.png) no-repeat;
+    cursor:pointer;
+    border:none;
+    width:100;
+    height:100;
+}
+
+startButton1:active {
+     background:url(images/play2.png) no-repeat;
 }
 
 
