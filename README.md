@@ -2,10 +2,12 @@
 
 Fukushima Triple Disaster
 =========
-----
 
-##### Website: [http://www.fukushimajapan.org](http://www.fukushimajapan.org/ "www.fukushimajapan.org")
-
-----
-
-##### Process Book:  [processBook.pdf](https://github.com/mollylloyd/final-project/blob/master/processBook.pdf "processBook.pdf")
+Deliverables
+===========
+1. Process book: processBook.pdf
+2. Screencast:
+3. Website:
+4. Visualization code:
+   - /code/tsunamiVis.html
+   - /code/globalVis.html
