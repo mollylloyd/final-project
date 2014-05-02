@@ -1,3 +1,5 @@
+<img src="teaser.png" width="800" style="display: block; margin-left:auto; margin-right:auto;"/>
+
 We are submitting the following files
 
 implementation thus far: code/googlemap.html
