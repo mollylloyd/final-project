@@ -6,8 +6,8 @@ Fukushima Triple Disaster
 Deliverables
 ===========
 1. Process book: processBook.pdf
-2. Screencast:
-3. Website: (https://vimeo.com/93564129)
+2. Screencast: (https://vimeo.com/93564129)
+3. Website:
 4. Visualization code:
    - /code/tsunamiVis.html
    - /code/globalVis.html
