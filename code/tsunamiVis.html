@@ -1,0 +1,96 @@
+ <!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+
+path {
+  fill: none;
+  stroke-linejoin: round;
+}
+
+.land {
+  fill: #ddd;
+} 
+
+.states,
+.hexagons path {
+  stroke: #fff;
+}
+
+.g-damage {
+  font: 12px sans-serif;
+}
+.g-key {
+  font: 10px sans-serif;
+}
+
+.g-key text.g-caption {
+  font-size: 11px;
+}
+.g-key path {
+  display: null;
+}
+
+.g-key line {
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.g-tooltip {
+  font: 11px sans-serif;
+  fill: #666;
+  position: absolute;
+  pointer-events: none;
+  -webkit-user-select: none;
+  user-select: none;
+  z-index: 100;
+}
+
+.g-tooltip .g-title {
+  font: bold 12px sans-serif;
+  fill: black;
+}
+
+.g-tooltip .g-number,
+.g-tooltip .g-click {
+  text-anchor: end;
+}
+
+.g-tooltip .g-click {
+  font-style: oblique;
+  fill: #aaa;
+}
+
+.g-tooltip .g-box {
+  fill: #fff;
+  stroke: #ccc;
+}
+
+.g-tooltip .g-shadow {
+  fill-opacity: .2;
+  filter: url(#g-blur);
+}
+
+.g-tooltip .g-row line {
+  stroke: #ddd;
+}
+
+.g-tooltip .g-row:last-child line {
+  display: none;
+}
+
+
+
+</style>
+<body>
+<script src="../libs/d3.v3.min.js"></script>
+<script src="http://d3js.org/d3.hexbin.v0.min.js"></script>
+<script src="http://d3js.org/d3.geo.projection.v0.min.js"></script>
+<script src="http://d3js.org/queue.v1.min.js"></script>
+<script src="http://d3js.org/topojson.v1.min.js"></script>
+<script src="../libs/topojson.js"></script>
+<div id="map">
+  <div class="g-section" data-key="japan"></div>
+</div>
+<script src="tsunamiVis.js"></script>
+

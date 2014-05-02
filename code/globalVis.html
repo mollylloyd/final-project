@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+.axis text {
+  font: 10px sans-serif;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.hexagon {
+  fill: none;
+  stroke: #000;
+  stroke-width: .5px;
+}
+
+axis text {
+  font: 10px sans-serif;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.hexagon {
+  fill: none;
+  stroke: #000;
+  stroke-width: .5px;
+}
+#g-graphic {
+  margin: 20px 10px;
+  position: relative;
+}
+
+#g-graphic h3 {
+  font-family: Helvetica, Arial;
+  font-size: 15px;
+  line-height: 1.5em;
+  margin-bottom: 6px;
+}
+
+.g-section {
+  border-top: solid 1px #ccc;
+  height: 925px;
+  padding-top: 20px;
+  position: relative;
+}
+
+.g-section:last-child {
+  border-bottom: solid 1px #ccc;
+}
+
+.g-halo path {
+  fill: none;
+  pointer-events: stroke;
+  stroke: transparent;
+  stroke-linejoin: round;
+  stroke-width: 30px;
+}
+
+.g-feature path {
+  fill: #ddd;
+}
+
+.g-outline path {
+  fill: none;
+  pointer-events: none;
+}
+
+.g-outline .g-active {
+  stroke: grey;
+  stroke-width: 1px;
+}
+
+.g-boundary {
+  fill: none;
+  stroke: #fff;
+  stroke-width: .5px;
+  stroke-linecap: round;
+  pointer-events: none;
+}
+
+#g-grid {
+  fill: none;
+  stroke: #555;
+  stroke-width: .5px;
+  stroke-opacity: .25;
+  stroke-linecap: round;
+}
+
+.g-label {
+  font: 11px sans-serif;
+  text-transform: uppercase;
+  text-anchor: middle;
+  text-shadow: 1px 1px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff;
+}
+
+#g-graphic text {
+  cursor: default;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.g-key {
+  font: 10px sans-serif;
+}
+
+.g-key text.g-caption {
+  font-size: 11px;
+}
+
+.g-caption {
+  font-weight: bold;
+}
+
+.g-key path {
+  display: none;
+}
+
+.g-key line {
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.g-summary {
+  font-size: 14px;
+  line-height: 1.35em;
+  position: absolute;
+  width: 340px;
+  color: #333;
+}
+
+.g-button {
+  margin-top: 14px;
+  width: 120px;
+}
+
+.g-note {
+  color: #888;
+  position: absolute;
+  font: 12px/1.35em sans-serif;
+  width: 160px;
+}
+
+.g-tooltip {
+  font: 11px sans-serif;
+  fill: #666;
+  position: absolute;
+  pointer-events: none;
+  -webkit-user-select: none;
+  user-select: none;
+  z-index: 100;
+}
+
+.g-tooltip .g-title {
+  font: bold 12px sans-serif;
+  fill: black;
+}
+
+.g-tooltip .g-number,
+.g-tooltip .g-click {
+  text-anchor: end;
+}
+
+.g-tooltip .g-click {
+  font-style: oblique;
+  fill: #aaa;
+}
+
+.g-tooltip .g-box {
+  fill: #fff;
+  stroke: #ccc;
+}
+
+.g-tooltip .g-shadow {
+  fill-opacity: .2;
+  filter: url(#g-blur);
+}
+
+.g-tooltip .g-row line {
+  stroke: #ddd;
+}
+
+.g-tooltip .g-row:last-child line {
+  display: none;
+}
+
+.storyHeader h1 {
+  font-size: 24px !important;
+  text-align: center;
+  margin-top: 15px !important;
+}
+
+.storySummary {
+  margin: auto;
+  padding: 0;
+  position: relative;
+  text-align: center;
+  width: 540px;
+}
+
+.storySummary .summary {
+  padding: 0 !important;
+}
+
+.g-hexagon {
+  fill: #bbb;
+  stroke: #555;
+}
+
+
+
+</style>
+<body>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="http://d3js.org/d3.hexbin.v0.min.js?5c6e4f0"></script>
+<script src="http://d3js.org/d3.geo.projection.v0.min.js"></script>
+<script src="http://d3js.org/topojson.v1.min.js"></script>
+<script src="http://d3js.org/queue.v1.min.js"></script>
+<!-- 
+<script src="datamunging1.js"></script> -->
+<script src="../libs/topojson.js"></script>
+  
+<div id="options">
+  <button id="econButton">Economic Losses</button>
+  <button id="deathButton">Fatalities</button>
+</div>
+
+   <div id="g-graphic">
+      <div class="g-section" data-key="gdp">
+      </div>
+   </div>
+<script src="globalVis.js"></script>
