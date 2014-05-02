@@ -7,9 +7,10 @@ Deliverables
 ===========
 1. Process book: processBook.pdf
 2. Screencast: (https://vimeo.com/93564129)
-3. Website:
+3. Website: http://beta.fukushimajapan.org
 4. Visualization code:
    - /code/tsunamiVis.html
    - /code/globalVis.html
    - /code/radiation.html
    - /code/earthquake.html
+   - /code/survey.html
