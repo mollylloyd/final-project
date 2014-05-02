@@ -3,16 +3,9 @@
 Fukushima Triple Disaster
 =========
 ----
-Deliverables: 
 
-<<<<<<< HEAD
-Process Book: processBook.pdf
-Screen Cast:
-Visualizations: 
-	/code/tsunamiVis.html
-	/code/globalVis.html
-=======
 ##### Website: [http://www.fukushimajapan.org](http://www.fukushimajapan.org/ "www.fukushimajapan.org")
->>>>>>> FETCH_HEAD
 
-Website
+----
+
+##### Process Book:  [processBook.pdf](https://github.com/mollylloyd/final-project/blob/master/processBook.pdf "processBook.pdf")
