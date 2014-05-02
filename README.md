@@ -11,3 +11,5 @@ Deliverables
 4. Visualization code:
    - /code/tsunamiVis.html
    - /code/globalVis.html
+   -/code/radiation.html
+   -/code/earthquake.html
