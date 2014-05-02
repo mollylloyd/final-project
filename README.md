@@ -1,10 +1,10 @@
 <img src="teaser.png" width="800" style="display: block; margin-left:auto; margin-right:auto; vertical-align:middle;"/>
 
--> Fukushima Triple Disaster <-
+Fukushima Triple Disaster
 =========
 ----
 
-##### Website: [www.fukushimajapan.org](www.fukushimajapan.org/ "www.fukushimajapan.org")
+##### Website: [http://www.fukushimajapan.org](http://www.fukushimajapan.org/ "www.fukushimajapan.org")
 
 ----
 
