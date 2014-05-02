@@ -1,11 +1,11 @@
 <img src="teaser.png" width="800" style="display: block; margin-left:auto; margin-right:auto;"/>
 
-We are submitting the following files
+Fukushima Triple Disaster
+=========
+----
 
-implementation thus far: code/googlemap.html
+##### Website: [www.fukushimajapan.org](www.fukushimajapan.org/ "www.fukushimajapan.org")
 
-process book thus far: Process Book and Website Visualizations.pdf 
-data directory: data used and discussed in the process book
-website directory: website mock
+----
 
-============
+##### Process Book:  [processBook.pdf](https://github.com/mollylloyd/final-project/blob/master/processBook.pdf "processBook.pdf")
