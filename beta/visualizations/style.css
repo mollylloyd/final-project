@@ -1,0 +1,289 @@
+html, body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: "Open Sans", sans-serif;
+}
+
+#map{
+	padding:100px;
+	width:100%;
+	height:100%;
+}
+
+ .labels {
+   color: red;
+   background-color: white;
+   font-family: "Open Sans", sans-serif;
+   font-size: 10px;
+   font-weight: bold;
+   text-align: center;
+   width: 60px;     
+   border: 2px solid black;
+   white-space: nowrap;
+ }
+
+#radiationMap{
+	padding:50px;
+	width:100%;
+	height:100%;
+	  cursor:crosshair;
+}
+
+#date{
+background-color:yellow;
+position: absolute;
+
+}
+
+.quakes, .quakes svg {
+  position: absolute;
+}
+
+.quakes svg {
+  width: 200px;
+  height: 200px;
+  padding:200px;
+  font: 10px;
+}
+
+.quakes quake-circle {
+  stroke: black;
+  stroke-width: 1px;
+}
+
+
+.waves, .waves svg {
+  position: absolute;
+}
+
+.waves svg {
+  width: 20px;
+  height: 20px;
+  padding:20px;
+  font: 10px;
+}
+
+.waves wave-circle {
+  stroke: black;
+  stroke-width: 1px;
+}
+
+.radiation, .radiation svg {
+  position: absolute;
+  
+}
+
+.radiation svg {
+	padding:50px;
+	width:1800px;
+	height:900px;
+	font: 10px;
+}
+
+.radiation-circle {
+  z-index:1;
+}
+
+.radiationInfo{
+	position:absolute;
+	left: 24px;
+	top: 168px;
+}
+
+.radiationInfo{
+	font-size: 12px;
+}
+.radiationInfo table .left{
+	text-align:right;
+}
+.radiationInfo table .center{
+	text-align:center;
+}
+.land {
+  fill: #007421;
+}
+
+.wave-circle {
+  fill: #0000FF;
+}
+
+.quake-circle {
+  fill: #c7141a;
+}
+
+.ring {
+  fill: none;
+  stroke: #c7141a;
+}
+
+
+/******************************
+ Legend
+ *****************************/
+ 
+ 
+.legend {
+    position:absolute;
+    left:100px;
+    top:100px;
+    width:200px;
+    text-align: left;
+    height: auto;
+    border: 1px solid #bbbbbb;
+    color: black;
+    background-color: white;
+    padding: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    pointer-events: none;
+}
+
+.legend h3 {
+    text-align:center;
+    margin-top:-3px;
+}
+
+/******************************
+ Radiation Chart
+ *****************************/
+
+ #radiationChart{
+	position: absolute;
+	width: 213px;
+	right: 100px;
+	top: 31px;
+	background: #ddd;
+	padding: 5px 5px 100px 0;
+	margin: 5px;
+	border-radius: 10px;
+	box-shadow: 0 0 10px #888888;
+}
+
+#geigerGaugeContainer{
+	position: absolute;
+	left: 43px;
+	top: 20px;
+
+}
+
+.radiation-circle{
+}
+/******************************
+ Bar Chart
+ *****************************/
+
+ #chart{
+	position:absolute;
+	width:892px;
+	left:10px;
+	top:10px;
+	background:rgba(220,220,220,0.5);
+	padding:5px;
+	margin:5px;
+	border:1px solid;
+	border-radius:10px;
+	box-shadow: 4px 4px 3px #888888;
+}
+ 
+.handle {
+	fill: rgb(140,140,140);
+	border: 1px solid black;
+	margin-right:7px;
+	background-position:center; 
+}
+
+.dateText{
+	position:absolute;
+	width:200px;
+	left:600px;
+	top:10px;
+}
+ 
+.bar:hover {
+  fill: brown;
+}
+
+.xAxis, .yAxis{
+  font: 8px;
+}
+
+.xAxis path, .yAxis path,
+.xAxis line, .yAxis line  {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+
+#startStop{
+	position: absolute;
+	left: 59px;
+	top: 14px;
+	z-index:1;
+}
+
+.startButton1{
+    background:url(images/play1.png) no-repeat;
+    cursor:pointer;
+    border:none;
+    width:100;
+    height:100;
+}
+
+startButton1:active {
+     background:url(images/play2.png) no-repeat;
+}
+
+
+/******************************
+ Radiation
+ *****************************/
+
+circle.Ce-144{
+	fill: #0000FF;
+	}
+
+circle.Cs-134{
+	fill: #3399FF;
+	}
+circle.Cs-136{
+	fill: #00FFCC;
+	}
+circle.Cs-137{
+	fill: #33CC33;
+	}
+circle.I-132{
+	fill: #CCFF66;
+	}
+circle.Np-239{
+	fill: #FF6666;
+	}
+circle.Sb-127{
+	fill: #FF0066;
+	}
+circle.Sr-89gamma{
+	fill: #FF33CC;
+	}
+circle.Te-129m{
+	fill: #9933FF;
+	}
+circle.Te-132{
+	fill: #FF0000;
+	}
+circle.Xe-133{
+	fill: #CCCCFF;
+	}
+circle.Zr-95{
+	fill: #339933;
+	}
+circle.I-131{
+	fill: #FF3300;
+	}
+circle.Sr-Total{
+	fill: #FFCCFF;
+	}
+circle.Ba-140{
+	fill: #993399;
+	}
+

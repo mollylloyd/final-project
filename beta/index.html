@@ -1,0 +1,275 @@
+<!-- Optimized for 1920x1080 resolution. Responsive version in the works.  -->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>FukushimaJapan.org</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+    <meta name="author" content="">
+    <!--[if lt IE 9]>
+    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <script src="fonts/cufon.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        Cufon.replace('.introText', { fontFamily: 'Garamond' });
+        Cufon.replace('h1, h2, h5, .subHeadline, .num, .nav, #surveyMenu, .slide .headline', { fontFamily: 'Frutiger LT Std' });
+    </script>
+</head>
+<body>
+
+<!-- Preloader -->
+<div id="mask">
+    <div id="loader">
+    </div>
+</div>
+<!-- End Preloader -->
+
+<section id="home" class="home slide0">
+    <div class="language" style="">
+        <b>English</b> | <a href="/?lang=japanese">Japanese</a>
+    </div>
+</section>
+<div class="subHeadline">
+    <div>
+        <b>JAPAN’S TRIPLE DISASTER:</b> The earthquake, tsunami and nuclear meltdown
+        that shook the world and became the most costly natural disaster in history
+    </div>
+</div>
+<section id="intro">
+    <div class="imgBox">
+        <div>
+            <img src="/images/manbaby.jpg">
+        </div>
+    </div>
+    <div class="introText">
+        <p><span class="dropCap">T</span>hree years have passed since the 2011 Tōhoku earthquake — the most powerful earthquake ever recorded to
+            hit Japan — and its accompanying tumultuous events, a 40.5 meter tsunami and the resulting Fukushima Daiichi nuclear disaster. With over 15,000 lives lost, nearly as
+            many injuries, some 300,000 displaced residents, the destruction of major coastal areas, a nuclear disaster only
+            rivaled by Chernobyl, and an estimated cost of $235 billion, Japan’s Triple Disaster remains at the forefront of global conscience with consequences that will last
+            generations.</p>
+
+        <p>We are creating a website in remembrance of the disaster to assist the Japanese and the world in understanding the events surrounding it and how best to move forward. We love this project and will continue developing it (at FukushimaJapan.org) even after CS-171 ends.</p>
+    </div>
+</section>
+<div class="fukushimaPrefecture">
+    <div class="inner">
+        <div>
+            <img src="/images/fukushima-prefecture.png" alt="Fukushima Prefecture">
+        </div>
+    </div>
+</div>
+<section id="scrollingVis">
+    <div class="slide1spacer"></div>
+    <div class="slide slide1">
+        <a name="slide1"></a>
+
+        <div class="slide slide1-1">
+            <div class="photoNarrative">
+                <h2>Massive quake hits Japan</h2>
+                <p>On Friday, March 11, 2011 a magnitude 9.0 earthquake approximately 70 km off shore violently shook the Western coast of Japan.
+                </p>
+            </div>
+            <img src="images/slides/1.jpg">
+        </div>
+        <div class="slide slide1-2">
+            <div class="photoNarrative">
+                <h2>Massive quake hits Japan</h2>
+                <p>It was the most powerful earthquake to ever hit Japan, and the fifth most powerful ever recorded in the world.</p>
+            </div>
+            <img src="images/slides/2.jpg">
+        </div>
+        <div class="slide slide1-3">
+            <iframe frameborder="0" scrolling="no" id="earthquakeVis" src="visualizations/earthquake.html" width="95%" height="90%" style="margin-top:70px;"></iframe>
+        </div>
+    </div>
+    <div class="slide slide2">
+        <a name="slide2"></a>
+        <div class="slide slide2-1">
+            <div class="photoNarrative">
+                <h2>Tsunami hits Iwate, Miyagi and Fukushima</h2>
+                <p>The massive quake triggered a powerful tsunami that inundated much of the Western coast, travelling up to 6 miles inland in some parts of the country, leaving death and destruction in its wake.
+                </p>
+            </div>
+            <img src="images/slides/3.jpg">
+        </div>
+        <div class="slide slide2-2">
+            <div class="photoNarrative">
+                <h2>Tsunami hits Iwate, Miyagi and Fukushima</h2>
+                <p>Almost one million buildings and homes were damaged or destroyed, leaving hundreds of thousands homeless and in shelters.</p>
+            </div>
+            <iframe frameborder="0" scrolling="no" id="tsunamiVis" src="visualizations/earthquake.html" width="65%" height="65%" style="margin-top:70px;"></iframe>
+        </div>
+    </div>
+    <div class="slide slide3">
+        <a name="slide3"></a>
+        <div class="slide slide3-1">
+            <div class="photoNarrative">
+                <h2>Tsunami triggers most costly nuclear meltdown ever</h2>
+
+                <p>The 14 meter high tsunami wave that struck Fukushima overwhelmed the 10 meter sea wall protecting the Fukushima Nuclear Power Plant. The water flooded the back-up diesel generators that were powering the reactors’ cooling mechanisms, leading to explosions and melt-down in four of the plant’s six reactors.
+                <br><br>The release of radiation following the meltdown led the government to order the evacuation of all people in a 20km radius from the plant—forcing almost 400,000 from their homes and into shelters.
+                </p>
+            </div>
+            <img src="images/slides/4.jpg">
+        </div>
+
+        <div class="slide slide3-2">
+            <iframe frameborder="0" scrolling="no" id="radiationVis" src="visualizations/radiation.html" width="60%" height="60%" style="margin-top:70px;"></iframe>
+        </div>
+    </div>
+    <div class="slide slide4">
+        <a name="slide4"></a>
+        <div id="survey">
+
+            <div class="surveyVis">
+                <div class="svgContainer"></div>
+            </div>
+
+            <div class="survey slide slide4-1" id="surveyIntro">
+                <div class="text">
+                    <div>
+                        <img src="images/japan-flag.png">
+                    </div>
+                    <h5>Japan</h5>
+
+                    <h2>Triple Disaster Survey</h2>
+
+                    <p>From April 20 to May 1 2014, we conducted a survey among Japanese who use Facebook. We asked them to answer questions and share their thoughts and feelings about the disaster. We received over 300 survey responses. Each dot represents a response from our survey. Mouse over any dot to reveal that person's thoughts or click down to see more results from our survey.</p>
+                </div>
+            </div>
+
+            <div class="survey slide slide4-2">
+                <div class="surveyMenu"></div>
+                <div class="text">
+                    <h2>INTERESTING RESULTS</h2>
+
+                    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
+                        exercitation
+                        ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur
+                        sint
+                        occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                    <!--<div style="position:relative;">
+                        <div style="position:absolute;z-index:9999;">
+                            <button class="btn btn-red active">Displaced from Home</button>
+                            <button class="btn btn-red active">Income Loss</button>
+                            <button class="btn btn-red active">Injured Friend/Family</button>
+                            <button class="btn btn-red active">Missing/Dead Friend/Family</button>
+                            <button class="btn btn-red active">Other Involvement</button>
+                            <button class="btn btn-red active">Not Involved</button>
+                        </div>
+                    </div>-->
+                </div>
+            </div>
+
+            <div class="survey slide slide4-3">
+                <div class="surveyMenu"></div>
+                <div class="text">
+                    <h2>INTERESTING RESULTS</h2>
+
+                    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
+                        exercitation
+                        ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur
+                        sint
+                        occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                    <!--<div style="position:relative;">
+                        <div style="position:absolute;z-index:9999;">
+                            <button class="btn btn-red active">Displaced from Home</button>
+                            <button class="btn btn-red active">Income Loss</button>
+                            <button class="btn btn-red active">Injured Friend/Family</button>
+                            <button class="btn btn-red active">Missing/Dead Friend/Family</button>
+                            <button class="btn btn-red active">Other Involvement</button>
+                            <button class="btn btn-red active">Not Involved</button>
+                        </div>
+                    </div>-->
+                </div>
+            </div>
+
+            <div class="survey slide slide4-4 dynamic">
+                <div class="surveyMenu dynamic"></div>
+                <div class="text">
+                    <h2>WORK WITH THE SURVEY DATA</h2>
+
+                    <p>We've shown just a few interesting correlations that we found from our survey data. But we encourage you to peruse the data yourself. Choose a question by selecting it at the top or exclude certain variables by clicking a button below.</p>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
+                        exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                    <div style="position:relative;">
+                        <div style="position:absolute;z-index:9999;">
+                            <button class="btn btn-red active" id="displaced">Displaced from Home</button>
+                            <button class="btn btn-red active" id="income">Income Loss</button>
+                            <button class="btn btn-red active" id="injured">Injured Friend/Family</button>
+                            <button class="btn btn-red active" id="dead">Missing/Dead Friend/Family</button>
+                            <button class="btn btn-red active" id="other">Other Involvement</button>
+                            <button class="btn btn-red active" id="notinvolved">Not Involved</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div class="slide slide5" style="float:left;">
+        <a name="slide5"></a>
+
+        <div class="globalVis">
+            <div id="options">
+                <button id="econButton" class="btn btn-red">Economic Losses</button>
+                <button id="deathButton" class="btn btn-red">Fatalities</button>
+            </div>
+
+            <div id="g-graphic">
+                <div class="g-section" data-key="gdp">
+                </div>
+            </div>
+        </div>
+
+        <div class="globalText">
+            <h2>Natural Disasters Across the Globe</h2>
+
+            <p>The economic and human toll of natural disasters is felt across the globe as their frequency increases.</p>
+
+            <p>While Japan's Triple Disaster became the most costly natural disaster in history, loss of life was moderate compared to other events such as the 2010 Haiti earthquake and the tsunami in Sri Lanka in 2004.</p>
+
+            <p>Interestingly, loss of life and loss of capital tend to be inversely related, an indication of the development gap between wealthy and poor countries. While disaster preparedness is important for all countries, those with fewer resources could benefit from the contingency plans and emergency response measures that their more wealthy neighbors already have in place.</p>
+        </div>
+
+    </div>
+</section>
+<div class="navWrapper">
+    <ul class="nav">
+        <li><a rel="0" class="homeNav">Home</a></li>
+        <li><a rel="1" class="slide1Nav">Earthquake</a></li>
+        <li><a rel="2" class="slide2Nav">Tsunami</a></li>
+        <li><a rel="3" class="slide3Nav">Nuclear Meltdown</a></li>
+        <li><a rel="4" class="slide4Nav">Triple Disaster Survey</a></li>
+        <li><a rel="5" class="slide5Nav">Global Disasters</a></li>
+    </ul>
+</div>
+<footer>
+    <div style="position:relative;">
+        <div style="position: absolute;top: 335px;right: 30px;">
+            <h5>Aizuwakamatsu Castle,<br>Fukushima Japan</h5>
+        </div>
+        <img src="images/castle.jpg" style="float:left;bottom:0;">
+    </div>
+    <div class="logo">
+        <img src="/images/harvard.png">
+    </div>
+</footer>
+<script src="js/jquery-1.11.0.min.js"></script>
+<script src="js/lodash.custom.min.js"></script>
+<script src="js/d3.v3.min.js"></script>
+<script src="js/waypoints.min.js"></script>
+<script src="js/jquery.mousewheel.min.js"></script>
+<script src="js/jquery.easing-1.3.min.js"></script>
+<script src="http://d3js.org/d3.hexbin.v0.min.js?5c6e4f0"></script>
+<script src="http://d3js.org/d3.geo.projection.v0.min.js"></script>
+<script src="http://d3js.org/topojson.v1.min.js"></script>
+<script src="http://d3js.org/queue.v1.min.js"></script>
+<script src="js/topojson.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

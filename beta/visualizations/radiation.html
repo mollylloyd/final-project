@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no"/>
+    <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=true"></script>
+    <script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+	<script type="text/javascript" src="gauge.js"></script>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,600,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="style.css" media="all"/>
+</head>
+<body>
+<div id="radiationMap"></div>
+<div id="webFormWrapper">
+<div id="radiationChart">
+	<span id="geigerGaugeContainer"></span>
+	<div class="radiationInfo"</div>
+</div>
+<script type="text/javascript">
+// Create the Google Map
+var map = new google.maps.Map(d3.select("#radiationMap").node(), {
+    zoom: 8,
+    center: new google.maps.LatLng(37.422458,  141.031917),
+    mapTypeControl: false,
+    zoomControl: false,
+    draggable: false,
+    scrollwheel: false,
+    disableDoubleClickZoom: true,
+    mapTypeId: google.maps.MapTypeId.ROADMAP,
+    disableDefaultUI: true
+});
+
+
+
+
+
+var gauge;
+
+function createGauge(name, label, min, max)
+	{
+		var config = 
+		{
+			size: 150,
+			label: label,
+			min: undefined != min ? min : 0,
+			max: undefined != max ? max : 100,
+			minorTicks: 10
+		}
+		
+		var range = config.max - config.min;
+		config.yellowZones = [{ from: config.min + range*0.4, to: config.min + range*0.7 }];
+		config.redZones = [{ from: config.min + range*0.7, to: config.max }];
+		
+		gauge = new Gauge(name + "GaugeContainer", config);
+		gauge.render();
+	}
+	
+function createTable(d){
+		var days = Math.round((new Date("March 11, 2011") - new Date(d.value[0].CollectionDate)) / (1000*60*60*24));
+		
+		if(days>=0){
+			days = days +" Days before the Tsunami";
+		}else{
+			days = days*-1;
+			days = days +" Days after the Tsunami";
+		}
+		var dateFormat = d3.time.format("%Y-%m-%d");
+
+		var outString = "<table><tr><td colspan=\"2\" class=\"center\"><b>"+days+"</b></td></tr>"+
+		"<tr><td class=\"left\">Collection Date: </td><td>"+dateFormat(new Date(d.value[0].CollectionDate))+"</td></tr>"+
+		"<tr><td class=\"left\">Type: </td><td>"+d.value[0].Type+"</td></tr>"+
+		"<tr><td class=\"left\">Bearing: </td><td>"+Math.round(d.value[0].Bearing)+"</td></tr>"+
+		"<tr><td colspan=\"2\" class=\"center\"><b><u>Nuclide</u></b></td></tr>";
+		for (var key in d.value[0].nuclide) {
+			outString = outString + "<tr><td class=\"left\">"+key+": </td><td>"+d.value[0].nuclide[key]+" "+d.value[0].Unit+"</td></tr>"
+		}
+		outString = outString + "</table>";
+		return outString;
+}
+
+
+//chart variables
+var chartMargin = {top: 50, right: 800, bottom: 38, left: 40},
+	width = 50 - chartMargin.left - chartMargin.right,
+	height = 500 - chartMargin.top - chartMargin.bottom;
+
+var barSvg = d3.select("#radiationChart").append("svg")
+	.attr("width", width + chartMargin.left + chartMargin.right)
+	.attr("height", height + chartMargin.top + chartMargin.bottom)
+	.append("g")
+		.attr("transform", "translate(" + chartMargin.left + "," + chartMargin.top + ")");
+
+var googleProjection,
+    radiationPadding = 50,
+    radiationLayer;
+
+var currentDate = new Date();
+var startDate = new Date();
+var endDate = new Date();
+	
+//begin basemap styles
+var styles = [
+    {
+        stylers: [
+            { hue: "#0099CC" },
+            { saturation: -50}
+        ]
+    },
+    {
+        featureType: "road",
+        elementType: "geometry",
+        stylers: [
+            { lightness: 100 },
+            { visibility: "off" }
+        ]
+    },
+    {
+        featureType: "road",
+        elementType: "labels",
+        stylers: [
+            { visibility: "off" }
+        ]
+    },
+    {
+        featureType: "landscape",
+        elementType: "all",
+        stylers: [
+            {visibility: "on"},
+            {color: "#CCCCCC"},
+            {saturation: -50}
+        ]
+    },
+    {
+        featureType: "administrative.locality",
+        elementType: "labels",
+        stylers: [
+            {visibility: "off"}
+        ]
+    },
+    {
+        featureType: "administrative.province",
+        elementType: "geometry.stroke",
+        stylers: [
+            {visibility: "off"}
+        ]
+    },
+    {
+        featureType: "administrative.province",
+        elementType: "geometry",
+        stylers: [
+            {hue: "#0D0D0D"},
+            {saturation: 100}
+        ]
+    }
+];
+//end map styles
+
+//addDays date function
+Date.prototype.addDays = function(days)
+{
+    var dat = new Date(this.valueOf());
+    dat.setDate(dat.getDate() + days);
+    return dat;
+}
+
+//radiation Color
+var radiationColor = d3.scale.linear()
+    .range(["yellow","red"])
+    .interpolate(d3.interpolateLab);
+
+//apply map styles to the map
+map.setOptions({styles: styles});
+
+//Create the Gauge
+createGauge("geiger", "uCi/m2");
+
+// Load the radiation data. When the data comes back, create an overlay.
+d3.csv("../data/FieldSampleInstrumentResults.csv", function (error, radiation_data) {
+    var overlay = new google.maps.OverlayView();
+
+	var AnalysisId,
+		SampleId,
+		NuclideName;
+	
+	var j = 0;
+	
+	var sortedData = {};
+	var nuclideArray = {};
+	var resultSum = 0;
+	var maxResultSum = 0;
+	
+	var dataLength = radiation_data.length;
+
+	for (var i=0;i<dataLength;i++){
+		if(SampleId != radiation_data[i].SampleId){
+			if(SampleId!== undefined){
+			//console.log("SampleId   "+radiation_data[i].SampleId+"   Latitude   "+radiation_data[i].Latitude+"  Longitude  "+radiation_data[i].Longitude+"  resultSum  "+resultSum+"  nuclide  "+nuclideArray)
+			   sortedData[j] = [{"SampleId":radiation_data[i].SampleId,
+				   "Type":radiation_data[i].Type,
+				   "Source":radiation_data[i].Source,
+				   "CollectionDate":radiation_data[i].CollectionDate,
+				   "Description":radiation_data[i].Description,
+				   "SpectraFile":radiation_data[i].SpectraFile,
+				   "SamplingTime":radiation_data[i].SamplingTime,
+				   "InstrumentHeight":radiation_data[i].InstrumentHeight,
+				   "MethodCode":radiation_data[i].MethodCode,
+				   "Moisture_pct":radiation_data[i].Moisture_pct,
+				   "Unit":radiation_data[i].Unit,
+				   "Distance_miles":radiation_data[i].Distance_miles,
+				   "Bearing":radiation_data[i].Bearing,
+				   "Direction":radiation_data[i].Direction,
+				   "Fixed":radiation_data[i].Fixed,
+				   "Latitude":radiation_data[i].Latitude,
+				   "Longitude":radiation_data[i].Longitude,
+				   "resultSum":resultSum,
+				   "nuclide":nuclideArray}];
+			   j++;
+			   nuclideArray = {};
+			   if(resultSum > maxResultSum){
+					maxResultSum = resultSum;
+			   }
+			   resultSum = 0;
+			 }
+		}else{
+			NuclideName = radiation_data[i].Nuclide;
+			nuclideArray[NuclideName] =  radiation_data[i].Result;
+			resultSum = resultSum + parseFloat(radiation_data[i].Result);
+		}
+		SampleId = radiation_data[i].SampleId;
+	}
+	
+	//set the max domain for the color
+	radiationColor.domain([0, 60])
+	
+    // Add the container when the overlay is added to the map.
+    overlay.onAdd = function () {
+	radiationLayer = d3.select(overlay.getPanes().overlayMouseTarget).append("div")
+		.attr("class", "radiation");
+
+		var layer = d3.select(this.getPanes().overlayMouseTarget)
+			.append("div")
+			.attr("class", "stations");
+
+		var radiation = radiationLayer.append("svg")
+			.attr("class", "radiation");
+		
+		overlay.draw = function () {
+		var projection = this.getProjection();
+		
+		//add circles
+		radiation.selectAll("circle")
+			.data(d3.entries(sortedData))
+			.each(transform) // update existing markers
+				.enter().append("circle")
+				.attr("class", "radiation-circle")
+				.attr("r", 5)
+				.each(transform)
+				.attr("class", "radiation-circle")
+				.style("z-index","1")
+				.attr("fill",function(d) {return radiationColor(d.value[0].resultSum)})
+				.on("mouseover", function(d,i) { 
+					gauge.redraw(d.value[0].resultSum)
+					d3.select(".radiationInfo")
+						.html(createTable(d)) 
+				})
+				.on("mouseout", function(d,i) { gauge.redraw(0); });
+
+			//Add power plant marker
+			var marker = new google.maps.Marker({
+			  position: new google.maps.LatLng(37.3458,141.201917),
+			  icon: new google.maps.MarkerImage('plant_marker.svg',
+				null, null, null, new google.maps.Size(64,64)),
+			  draggable: false,
+			  map: map
+			});
+				
+		  function transform(d) {
+				d = new google.maps.LatLng(d.value[0].Latitude, d.value[0].Longitude);
+				d = projection.fromLatLngToDivPixel(d);
+				return d3.select(this)
+					.attr("cx", (d.x - radiationPadding))
+					.attr("cy", (d.y - radiationPadding));
+			  }
+		};
+    };
+    overlay.setMap(map);
+});
+</script>
+</body>
+</html>
